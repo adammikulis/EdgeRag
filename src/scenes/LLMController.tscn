@@ -1,0 +1,120 @@
+[gd_scene load_steps=5 format=3 uid="uid://rwf1hn8in73w"]
+
+[ext_resource type="Theme" uid="uid://c8i2vubjakfwj" path="res://resources/system_theme.tres" id="1_h2ooi"]
+
+[sub_resource type="SystemFont" id="SystemFont_2spo7"]
+
+[sub_resource type="Theme" id="Theme_fs6ip"]
+default_font = SubResource("SystemFont_2spo7")
+
+[sub_resource type="LabelSettings" id="LabelSettings_xvflj"]
+
+[node name="LLMController" type="Node"]
+
+[node name="LLMControllerInterface" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="GridContainer" type="GridContainer" parent="LLMControllerInterface"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+columns = 2
+
+[node name="OutputContainer" type="MarginContainer" parent="LLMControllerInterface/GridContainer"]
+custom_minimum_size = Vector2(0, 500)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="MainTextLabel" type="RichTextLabel" parent="LLMControllerInterface/GridContainer/OutputContainer"]
+layout_direction = 2
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+focus_mode = 2
+theme = SubResource("Theme_fs6ip")
+selection_enabled = true
+
+[node name="ButtonContainer" type="VBoxContainer" parent="LLMControllerInterface/GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+alignment = 2
+
+[node name="GridContainer" type="GridContainer" parent="LLMControllerInterface/GridContainer/ButtonContainer"]
+layout_mode = 2
+columns = 2
+
+[node name="CurrentModelTitleLabel" type="Label" parent="LLMControllerInterface/GridContainer/ButtonContainer/GridContainer"]
+layout_mode = 2
+text = "Current Model:"
+label_settings = SubResource("LabelSettings_xvflj")
+
+[node name="CurrentModelLabel" type="Label" parent="LLMControllerInterface/GridContainer/ButtonContainer/GridContainer"]
+layout_mode = 2
+label_settings = SubResource("LabelSettings_xvflj")
+
+[node name="ManageModelsButton" type="Button" parent="LLMControllerInterface/GridContainer/ButtonContainer"]
+custom_minimum_size = Vector2(0, 50)
+layout_mode = 2
+text = "Manage Models"
+
+[node name="ManageConversationHistoryButton" type="Button" parent="LLMControllerInterface/GridContainer/ButtonContainer"]
+visible = false
+custom_minimum_size = Vector2(0, 50)
+layout_mode = 2
+text = "Manage Conversation
+History"
+
+[node name="HBoxContainer" type="HBoxContainer" parent="LLMControllerInterface/GridContainer/ButtonContainer"]
+visible = false
+layout_mode = 2
+
+[node name="ManageDatabasesButton" type="Button" parent="LLMControllerInterface/GridContainer/ButtonContainer/HBoxContainer"]
+custom_minimum_size = Vector2(0, 50)
+layout_mode = 2
+text = "Manage Databases"
+
+[node name="UseDatabaseCheckBox" type="CheckBox" parent="LLMControllerInterface/GridContainer/ButtonContainer/HBoxContainer"]
+layout_mode = 2
+disabled = true
+toggle_mode = false
+text = "Use Database"
+
+[node name="StartNewChatButton" type="Button" parent="LLMControllerInterface/GridContainer/ButtonContainer"]
+custom_minimum_size = Vector2(0, 50)
+layout_mode = 2
+text = "Start New Chat"
+
+[node name="SystemInfoLabel" type="RichTextLabel" parent="LLMControllerInterface/GridContainer/ButtonContainer"]
+layout_mode = 2
+text = "System Information:"
+
+[node name="MainInputScrollContainer" type="ScrollContainer" parent="LLMControllerInterface/GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="LineEditInput" type="LineEdit" parent="LLMControllerInterface/GridContainer/MainInputScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme = ExtResource("1_h2ooi")
+
+[node name="SubmitButton" type="Button" parent="LLMControllerInterface/GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 0.25
+text = "Submit"
+
+[connection signal="text_changed" from="LLMControllerInterface/GridContainer/MainInputScrollContainer/LineEditInput" to="LLMControllerInterface" method="_on_line_edit_input_text_changed"]

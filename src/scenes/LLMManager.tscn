@@ -1,0 +1,18 @@
+[gd_scene load_steps=2 format=3 uid="uid://8vsa6rvcxdvh"]
+
+[ext_resource type="Script" path="res://src/csharpscripts/LLMManager.cs" id="1_j3qwc"]
+
+[node name="LLMManager" type="Node" node_paths=PackedStringArray("modelFileDialog")]
+script = ExtResource("1_j3qwc")
+modelFileDialog = NodePath("ModelFileDialog")
+
+[node name="ModelFileDialog" type="FileDialog" parent="."]
+title = "Open a File"
+initial_position = 2
+size = Vector2i(500, 500)
+visible = true
+min_size = Vector2i(500, 500)
+ok_button_text = "Open"
+file_mode = 0
+access = 2
+show_hidden_files = true
