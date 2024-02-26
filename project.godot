@@ -15,17 +15,13 @@ run/main_scene="res://src/scenes/LLMController.tscn"
 config/features=PackedStringArray("4.2", "C#", "Mobile")
 config/icon="res://icon.svg"
 
-[autoload]
-
-llm="*res://src/csharpscripts/LLMManager.cs"
-
 [dotnet]
 
 project/assembly_name="EdgeRagUI"
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/llm_tool/plugin.cfg")
+enabled=PackedStringArray("res://addons/godot_state_charts/plugin.cfg")
 
 [rendering]
 

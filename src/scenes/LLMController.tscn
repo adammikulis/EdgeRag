@@ -1,8 +1,16 @@
-[gd_scene load_steps=5 format=3 uid="uid://rwf1hn8in73w"]
+[gd_scene load_steps=12 format=3 uid="uid://4u10q38gk8d2"]
 
+[ext_resource type="Script" path="res://src/csharpscripts/LLMController.cs" id="1_dnh8n"]
 [ext_resource type="Theme" uid="uid://c8i2vubjakfwj" path="res://resources/system_theme.tres" id="1_h2ooi"]
+[ext_resource type="Script" path="res://src/csharpscripts/ChatManager.cs" id="2_uifo4"]
+[ext_resource type="Script" path="res://src/csharpscripts/ModelManager.cs" id="3_1jv2p"]
+[ext_resource type="Script" path="res://addons/godot_state_charts/state_chart.gd" id="4_s2caw"]
+[ext_resource type="Script" path="res://addons/godot_state_charts/compound_state.gd" id="5_umpyf"]
+[ext_resource type="Script" path="res://addons/godot_state_charts/atomic_state.gd" id="6_x8t6v"]
+[ext_resource type="Script" path="res://addons/godot_state_charts/transition.gd" id="7_6v438"]
 
 [sub_resource type="SystemFont" id="SystemFont_2spo7"]
+subpixel_positioning = 0
 
 [sub_resource type="Theme" id="Theme_fs6ip"]
 default_font = SubResource("SystemFont_2spo7")
@@ -10,33 +18,71 @@ default_font = SubResource("SystemFont_2spo7")
 [sub_resource type="LabelSettings" id="LabelSettings_xvflj"]
 
 [node name="LLMController" type="Node"]
+script = ExtResource("1_dnh8n")
 
-[node name="LLMControllerInterface" type="Control" parent="."]
+[node name="ModelManager" type="Node" parent="."]
+unique_name_in_owner = true
+script = ExtResource("3_1jv2p")
+
+[node name="ModelManagerControl" type="Control" parent="ModelManager"]
+unique_name_in_owner = true
 layout_mode = 3
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-size_flags_horizontal = 3
-size_flags_vertical = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
 
-[node name="GridContainer" type="GridContainer" parent="LLMControllerInterface"]
+[node name="ModelGridContainer" type="GridContainer" parent="ModelManager/ModelManagerControl"]
+layout_mode = 0
+offset_right = 194.0
+offset_bottom = 40.0
+columns = 2
+
+[node name="ChooseModelDirectoryButton" type="Button" parent="ModelManager/ModelManagerControl/ModelGridContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Choose Model Directory"
+
+[node name="ModelFileDialog" type="FileDialog" parent="ModelManager/ModelManagerControl"]
+unique_name_in_owner = true
+title = "Open a File"
+initial_position = 2
+size = Vector2i(500, 500)
+min_size = Vector2i(500, 500)
+ok_button_text = "Open"
+file_mode = 0
+access = 2
+show_hidden_files = true
+
+[node name="ChatManager" type="Node" parent="."]
+unique_name_in_owner = true
+script = ExtResource("2_uifo4")
+
+[node name="ChatManagerControl" type="Control" parent="ChatManager"]
+unique_name_in_owner = true
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="ChatGridContainer" type="GridContainer" parent="ChatManager/ChatManagerControl"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+offset_right = 938.0
+offset_bottom = 564.0
 grow_horizontal = 2
 grow_vertical = 2
 columns = 2
 
-[node name="OutputContainer" type="MarginContainer" parent="LLMControllerInterface/GridContainer"]
-custom_minimum_size = Vector2(0, 500)
+[node name="OutputContainer" type="MarginContainer" parent="ChatManager/ChatManagerControl/ChatGridContainer"]
+custom_minimum_size = Vector2(0, 450)
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="MainTextLabel" type="RichTextLabel" parent="LLMControllerInterface/GridContainer/OutputContainer"]
+[node name="MainTextLabel" type="RichTextLabel" parent="ChatManager/ChatManagerControl/ChatGridContainer/OutputContainer"]
+custom_minimum_size = Vector2(800, 0)
 layout_direction = 2
 layout_mode = 2
 size_flags_horizontal = 3
@@ -45,76 +91,108 @@ focus_mode = 2
 theme = SubResource("Theme_fs6ip")
 selection_enabled = true
 
-[node name="ButtonContainer" type="VBoxContainer" parent="LLMControllerInterface/GridContainer"]
+[node name="ButtonContainer" type="VBoxContainer" parent="ChatManager/ChatManagerControl/ChatGridContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 alignment = 2
 
-[node name="GridContainer" type="GridContainer" parent="LLMControllerInterface/GridContainer/ButtonContainer"]
+[node name="GridContainer" type="GridContainer" parent="ChatManager/ChatManagerControl/ChatGridContainer/ButtonContainer"]
 layout_mode = 2
 columns = 2
 
-[node name="CurrentModelTitleLabel" type="Label" parent="LLMControllerInterface/GridContainer/ButtonContainer/GridContainer"]
+[node name="CurrentModelTitleLabel" type="Label" parent="ChatManager/ChatManagerControl/ChatGridContainer/ButtonContainer/GridContainer"]
 layout_mode = 2
 text = "Current Model:"
 label_settings = SubResource("LabelSettings_xvflj")
 
-[node name="CurrentModelLabel" type="Label" parent="LLMControllerInterface/GridContainer/ButtonContainer/GridContainer"]
+[node name="CurrentModelLabel" type="Label" parent="ChatManager/ChatManagerControl/ChatGridContainer/ButtonContainer/GridContainer"]
 layout_mode = 2
 label_settings = SubResource("LabelSettings_xvflj")
 
-[node name="ManageModelsButton" type="Button" parent="LLMControllerInterface/GridContainer/ButtonContainer"]
+[node name="ManageModelsButton" type="Button" parent="ChatManager/ChatManagerControl/ChatGridContainer/ButtonContainer"]
+unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 50)
 layout_mode = 2
-text = "Manage Models"
+text = "Manage/Load Models"
 
-[node name="ManageConversationHistoryButton" type="Button" parent="LLMControllerInterface/GridContainer/ButtonContainer"]
+[node name="ManageConversationHistoryButton" type="Button" parent="ChatManager/ChatManagerControl/ChatGridContainer/ButtonContainer"]
 visible = false
 custom_minimum_size = Vector2(0, 50)
 layout_mode = 2
 text = "Manage Conversation
 History"
 
-[node name="HBoxContainer" type="HBoxContainer" parent="LLMControllerInterface/GridContainer/ButtonContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="ChatManager/ChatManagerControl/ChatGridContainer/ButtonContainer"]
 visible = false
 layout_mode = 2
 
-[node name="ManageDatabasesButton" type="Button" parent="LLMControllerInterface/GridContainer/ButtonContainer/HBoxContainer"]
+[node name="ManageDatabasesButton" type="Button" parent="ChatManager/ChatManagerControl/ChatGridContainer/ButtonContainer/HBoxContainer"]
 custom_minimum_size = Vector2(0, 50)
 layout_mode = 2
 text = "Manage Databases"
 
-[node name="UseDatabaseCheckBox" type="CheckBox" parent="LLMControllerInterface/GridContainer/ButtonContainer/HBoxContainer"]
+[node name="UseDatabaseCheckBox" type="CheckBox" parent="ChatManager/ChatManagerControl/ChatGridContainer/ButtonContainer/HBoxContainer"]
 layout_mode = 2
 disabled = true
 toggle_mode = false
 text = "Use Database"
 
-[node name="StartNewChatButton" type="Button" parent="LLMControllerInterface/GridContainer/ButtonContainer"]
+[node name="StartNewChatButton" type="Button" parent="ChatManager/ChatManagerControl/ChatGridContainer/ButtonContainer"]
+unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 50)
 layout_mode = 2
 text = "Start New Chat"
 
-[node name="SystemInfoLabel" type="RichTextLabel" parent="LLMControllerInterface/GridContainer/ButtonContainer"]
+[node name="SystemInfoLabel" type="RichTextLabel" parent="ChatManager/ChatManagerControl/ChatGridContainer/ButtonContainer"]
 layout_mode = 2
 text = "System Information:"
 
-[node name="MainInputScrollContainer" type="ScrollContainer" parent="LLMControllerInterface/GridContainer"]
+[node name="MainInputScrollContainer" type="ScrollContainer" parent="ChatManager/ChatManagerControl/ChatGridContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="LineEditInput" type="LineEdit" parent="LLMControllerInterface/GridContainer/MainInputScrollContainer"]
+[node name="LineEditInput" type="LineEdit" parent="ChatManager/ChatManagerControl/ChatGridContainer/MainInputScrollContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 theme = ExtResource("1_h2ooi")
 
-[node name="SubmitButton" type="Button" parent="LLMControllerInterface/GridContainer"]
+[node name="ChatSubmitButton" type="Button" parent="ChatManager/ChatManagerControl/ChatGridContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 150)
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_stretch_ratio = 0.25
 text = "Submit"
 
-[connection signal="text_changed" from="LLMControllerInterface/GridContainer/MainInputScrollContainer/LineEditInput" to="LLMControllerInterface" method="_on_line_edit_input_text_changed"]
+[node name="LLMStateChart" type="Node" parent="."]
+unique_name_in_owner = true
+script = ExtResource("4_s2caw")
+track_in_editor = true
+
+[node name="CompoundState" type="Node" parent="LLMStateChart"]
+script = ExtResource("5_umpyf")
+initial_state = NodePath("ModelManagementState")
+
+[node name="ChatManagementState" type="Node" parent="LLMStateChart/CompoundState"]
+unique_name_in_owner = true
+script = ExtResource("6_x8t6v")
+
+[node name="TransitionToModelManagementState" type="Node" parent="LLMStateChart/CompoundState/ChatManagementState"]
+script = ExtResource("7_6v438")
+to = NodePath("../../ModelManagementState")
+event = &"onModelManagementEvent"
+
+[node name="ModelManagementState" type="Node" parent="LLMStateChart/CompoundState"]
+unique_name_in_owner = true
+script = ExtResource("6_x8t6v")
+
+[node name="TransitionToChatManagementState" type="Node" parent="LLMStateChart/CompoundState/ModelManagementState"]
+script = ExtResource("7_6v438")
+to = NodePath("../../ChatManagementState")
+event = &"onChatManagementEvent"
+
+[connection signal="ManageModelsButton" from="ChatManager" to="." method="OnChatManagerManageModelsButton"]
+[connection signal="state_entered" from="LLMStateChart/CompoundState/ChatManagementState" to="." method="_on_chat_management_state_state_entered"]
