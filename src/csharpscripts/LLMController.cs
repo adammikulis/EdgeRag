@@ -1,44 +1,60 @@
 using Godot;
-using GodotStateCharts;
 using System;
 
 public partial class LLMController : Node
 {
 
+	private Button startProgramButton;
 	private ChatManager chatManager;
 	private ModelManager modelManager;
-    private StateChart stateChart;
-	private State chatManagementState, modelManagementState;
+	private Control splashScreen;
 
 	public override void _Ready()
 	{
 		chatManager = GetNode<ChatManager>("%ChatManager");
 		modelManager = GetNode<ModelManager>("%ModelManager");
+		splashScreen = GetNode<Control>("%SplashScreen");
+		startProgramButton = GetNode<Button>("%StartProgramButton");
 
-		stateChart = StateChart.Of(GetNode("%LLMStateChart"));
-		chatManagementState = State.Of(GetNode("%ChatManagementState"));
-		modelManagementState = State.Of(GetNode("%ModelManagementState"));
+		modelManager.OnModelLoaded += ManageChatState;
+		chatManager.ManageModelsButtonPressed += ManageModelsState;
+		startProgramButton.Pressed += OnStartProgramButtonPressed;
 
-		chatManager.ManageModelsButton += ManageModels;
+        //CallDeferred("ManageModelsState");
+        HideAllUI();
+		ShowSplashScreen();
+    }
 
 
-        CallDeferred(nameof(HideAllUI));
-	}
 
 	public void HideAllUI()
 	{
 		chatManager.HideUI();
 		modelManager.HideUI();
+		splashScreen.CallDeferred("hide");
 	}
 
-	private void ManageModels()
+	private void ShowSplashScreen()
 	{
-		stateChart.SendEvent("onModelManagementEvent");
+		splashScreen.CallDeferred("show");
 	}
 
-	private void ManageChat()
+	private void OnStartProgramButtonPressed()
 	{
-		CallDeferred(nameof(HideAllUI));
+		ManageModelsState();
+	}
+
+
+
+    private void ManageModelsState()
+	{
+        HideAllUI();
+        modelManager.ShowUI();
+    }
+
+	private void ManageChatState()
+	{
+		HideAllUI();
 		chatManager.ShowUI();
 	}
 

@@ -1,13 +1,9 @@
-[gd_scene load_steps=12 format=3 uid="uid://4u10q38gk8d2"]
+[gd_scene load_steps=8 format=3 uid="uid://4u10q38gk8d2"]
 
 [ext_resource type="Script" path="res://src/csharpscripts/LLMController.cs" id="1_dnh8n"]
 [ext_resource type="Theme" uid="uid://c8i2vubjakfwj" path="res://resources/system_theme.tres" id="1_h2ooi"]
 [ext_resource type="Script" path="res://src/csharpscripts/ChatManager.cs" id="2_uifo4"]
 [ext_resource type="Script" path="res://src/csharpscripts/ModelManager.cs" id="3_1jv2p"]
-[ext_resource type="Script" path="res://addons/godot_state_charts/state_chart.gd" id="4_s2caw"]
-[ext_resource type="Script" path="res://addons/godot_state_charts/compound_state.gd" id="5_umpyf"]
-[ext_resource type="Script" path="res://addons/godot_state_charts/atomic_state.gd" id="6_x8t6v"]
-[ext_resource type="Script" path="res://addons/godot_state_charts/transition.gd" id="7_6v438"]
 
 [sub_resource type="SystemFont" id="SystemFont_2spo7"]
 subpixel_positioning = 0
@@ -26,6 +22,7 @@ script = ExtResource("3_1jv2p")
 
 [node name="ModelManagerControl" type="Control" parent="ModelManager"]
 unique_name_in_owner = true
+visible = false
 layout_mode = 3
 anchors_preset = 0
 offset_right = 40.0
@@ -42,16 +39,14 @@ unique_name_in_owner = true
 layout_mode = 2
 text = "Choose Model Directory"
 
-[node name="ModelFileDialog" type="FileDialog" parent="ModelManager/ModelManagerControl"]
+[node name="ModelFileDialog" type="FileDialog" parent="ModelManager"]
 unique_name_in_owner = true
-title = "Open a File"
-initial_position = 2
+title = "Load a Language Model"
 size = Vector2i(500, 500)
-min_size = Vector2i(500, 500)
 ok_button_text = "Open"
+dialog_hide_on_ok = true
+mode_overrides_title = false
 file_mode = 0
-access = 2
-show_hidden_files = true
 
 [node name="ChatManager" type="Node" parent="."]
 unique_name_in_owner = true
@@ -59,6 +54,7 @@ script = ExtResource("2_uifo4")
 
 [node name="ChatManagerControl" type="Control" parent="ChatManager"]
 unique_name_in_owner = true
+visible = false
 layout_mode = 3
 anchors_preset = 0
 offset_right = 40.0
@@ -167,32 +163,31 @@ size_flags_horizontal = 3
 size_flags_stretch_ratio = 0.25
 text = "Submit"
 
-[node name="LLMStateChart" type="Node" parent="."]
+[node name="SplashScreen" type="Control" parent="."]
 unique_name_in_owner = true
-script = ExtResource("4_s2caw")
-track_in_editor = true
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 
-[node name="CompoundState" type="Node" parent="LLMStateChart"]
-script = ExtResource("5_umpyf")
-initial_state = NodePath("ModelManagementState")
+[node name="Panel" type="Panel" parent="SplashScreen"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 
-[node name="ChatManagementState" type="Node" parent="LLMStateChart/CompoundState"]
+[node name="StartProgramButton" type="Button" parent="SplashScreen/Panel"]
 unique_name_in_owner = true
-script = ExtResource("6_x8t6v")
+layout_mode = 0
+offset_left = 518.0
+offset_top = 249.0
+offset_right = 718.0
+offset_bottom = 341.0
+text = "Start Program"
 
-[node name="TransitionToModelManagementState" type="Node" parent="LLMStateChart/CompoundState/ChatManagementState"]
-script = ExtResource("7_6v438")
-to = NodePath("../../ModelManagementState")
-event = &"onModelManagementEvent"
-
-[node name="ModelManagementState" type="Node" parent="LLMStateChart/CompoundState"]
-unique_name_in_owner = true
-script = ExtResource("6_x8t6v")
-
-[node name="TransitionToChatManagementState" type="Node" parent="LLMStateChart/CompoundState/ModelManagementState"]
-script = ExtResource("7_6v438")
-to = NodePath("../../ChatManagementState")
-event = &"onChatManagementEvent"
-
-[connection signal="ManageModelsButton" from="ChatManager" to="." method="OnChatManagerManageModelsButton"]
-[connection signal="state_entered" from="LLMStateChart/CompoundState/ChatManagementState" to="." method="_on_chat_management_state_state_entered"]
+[connection signal="pressed" from="ModelManager/ModelManagerControl/ModelGridContainer/ChooseModelDirectoryButton" to="ModelManager" method="_on_choose_model_directory_button_pressed"]

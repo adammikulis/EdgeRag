@@ -3,11 +3,16 @@ using LLama.Common;
 using LLama;
 using System;
 using System.Threading.Tasks;
+using LLama.Batched;
 
 public partial class ModelManager : Node
 {
-	
-	FileDialog modelFileDialog;
+
+    [Signal]
+    public delegate void OnModelLoadedEventHandler();
+
+
+    FileDialog modelFileDialog;
 	Button chooseModelDirectoryButton;
 
 	[Export]
@@ -34,12 +39,13 @@ public partial class ModelManager : Node
 		chooseModelDirectoryButton = GetNode<Button>("%ChooseModelDirectoryButton");
 
 		chooseModelDirectoryButton.Pressed += OnChooseModelDirectory;
+		modelFileDialog.FileSelected += OnModelSelected;
 	}
 
 	public void HideUI()
 	{
-        modelManagerControl.CallDeferred("hide");
-		modelFileDialog.CallDeferred("hide");
+        modelManagerControl.Hide();
+		modelFileDialog.Hide();
         GD.Print("Hiding UI for" + Name);
     }
 
@@ -51,36 +57,44 @@ public partial class ModelManager : Node
 
 	private void OnChooseModelDirectory()
 	{
+		GD.Print("Choosing model directory");
 		ShowModelFileDialog();
 	}
 
 	public void ShowModelFileDialog()
 	{
-		modelFileDialog?.CallDeferred("PopupCentered");
+		modelFileDialog.CallDeferred("popup_centered");
 	}
 
 
-	private void OnModelSelected(string filePath)
+	private async void OnModelSelected(string filePath)
 	{
-		LoadModel(filePath);
-	}
+		GD.Print("Model selected!");
+		await LoadModelAsync(filePath);
+        EmitSignal(SignalName.OnModelLoaded);
+    }
 
-	private void LoadModel(string modelPath)
+	private async Task LoadModelAsync(string modelPath)
 	{
-		modelParams = new ModelParams(modelPath)
+		GD.Print($"Loading model from {modelPath}");
+		await Task.Run(() =>
 		{
-			ContextSize = 4096, // This can be changed by the user according to memory usage and model capability
-			EmbeddingMode = true, // This must be set to true to generate embeddings for vector search
-			GpuLayerCount = -1 // Set your number of layers to offload to the GPU here, depending on VRAM available (you can mix CPU with GPU for hybrid inference)
-		};
-		model = LLamaWeights.LoadFromFile(modelParams);
-		embedder = new LLamaEmbedder(model, modelParams);
-		context = model.CreateContext(modelParams);
-		executor = new InteractiveExecutor(context);
-		session = new ChatSession(executor);
-		isModelLoaded = true;
+			modelParams = new ModelParams(modelPath)
+			{
+				ContextSize = 4096, // This can be changed by the user according to memory usage and model capability
+				EmbeddingMode = true, // This must be set to true to generate embeddings for vector search
+				GpuLayerCount = 0 // Set your number of layers to offload to the GPU here, depending on VRAM available (you can mix CPU with GPU for hybrid inference)
+			};
+			model = LLamaWeights.LoadFromFile(modelParams);
+			embedder = new LLamaEmbedder(model, modelParams);
+			context = model.CreateContext(modelParams);
+			executor = new InteractiveExecutor(context);
+			session = new ChatSession(executor);
+			isModelLoaded = true;
+		});
 		GD.Print($"{modelPath} loaded\n");
-	}
+        
+    }
 
 	public async Task SubmitPromptAsync(string prompt)
 	{

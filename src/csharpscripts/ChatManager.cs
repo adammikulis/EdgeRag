@@ -5,7 +5,7 @@ public partial class ChatManager : Node
 {
 
     [Signal]
-    public delegate void ManageModelsButtonEventHandler();
+    public delegate void ManageModelsButtonPressedEventHandler();
 
 	private Button manageModelsButton, chatSubmitButton, startNewChat;
     [Export]
@@ -31,6 +31,7 @@ public partial class ChatManager : Node
     public void HideUI()
     {
         chatManagerControl.CallDeferred("hide");
+
         GD.Print("Hiding UI for" + Name);
     }
 
@@ -47,7 +48,7 @@ public partial class ChatManager : Node
 
     private void OnManageModelsButtonPressed()
     {
-        EmitSignal(SignalName.ManageModelsButton);
+        EmitSignal(SignalName.ManageModelsButtonPressed);
     }
 
 
