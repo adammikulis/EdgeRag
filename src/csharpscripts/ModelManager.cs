@@ -3,61 +3,86 @@ using LLama.Common;
 using LLama;
 using System;
 using System.Threading.Tasks;
+using Microsoft.KernelMemory;
+using Microsoft.KernelMemory.Configuration;
+using Microsoft.KernelMemory.Handlers;
 using LLama.Batched;
+using LLamaSharp.KernelMemory;
 
-public partial class ModelManager : Node
+public partial class ModelManager : Control
 {
 
     [Signal]
     public delegate void OnModelLoadedEventHandler();
+    [Signal]
+    public delegate void NewChatMessageEventHandler(string message);
+
+	public IKernelMemory modelKernel;
 
 
-    FileDialog modelFileDialog;
-	Button chooseModelDirectoryButton;
+    private FileDialog modelFileDialog;
+	private Button loadSelectedModelButton, selectModelButton;
+	private HSlider contextSizeSlider, numGpuLayersSlider;
+	private Label contextSizeLabel, numGpuLayersLabel;
+	private RichTextLabel selectedModelInfoLabel;
 
-	[Export]
-	GridContainer modelGridContainer;
 
-	[Signal]
-	public delegate void NewChatMessageEventHandler(string message);
-
-	private Control modelManagerControl;
-
-	private LLamaWeights model;
+    private LLamaWeights model;
 	private LLamaEmbedder embedder;
 	private LLamaContext context;
 	private ModelParams modelParams;
 	private ChatSession session;
 	private InteractiveExecutor executor;
+	private string modelPath;
+	private uint contextSize = 512;
 
 	private bool isModelLoaded = false;
 
 	public override void _Ready()
 	{
 		modelFileDialog = GetNode<FileDialog>("%ModelFileDialog");
-		modelManagerControl = GetNode<Control>("%ModelManagerControl");
-		chooseModelDirectoryButton = GetNode<Button>("%ChooseModelDirectoryButton");
 
-		chooseModelDirectoryButton.Pressed += OnChooseModelDirectory;
+		selectModelButton = GetNode<Button>("%SelectModelButton");
+		loadSelectedModelButton = GetNode<Button>("%LoadSelectedModelButton");
+
+		contextSizeSlider = GetNode<HSlider>("%ContextSizeSlider");
+		numGpuLayersSlider = GetNode<HSlider>("%NumGpuLayersSlider");
+
+		contextSizeLabel = GetNode<Label>("%ContextSizeLabel");
+		numGpuLayersLabel = GetNode<Label>("%NumGpuLayersLabel");
+		selectedModelInfoLabel = GetNode<RichTextLabel>("%SelectedModelInfoLabel");
+
+		contextSizeSlider.ValueChanged += OnContextSizeSliderChanged;
+
+		selectModelButton.Pressed += OnSelectModel;
 		modelFileDialog.FileSelected += OnModelSelected;
+		loadSelectedModelButton.Pressed += OnLoadSelectedModel;
 	}
 
 	public void HideUI()
 	{
-        modelManagerControl.Hide();
-		modelFileDialog.Hide();
-        GD.Print("Hiding UI for" + Name);
+        CallDeferred("hide");
+        modelFileDialog.CallDeferred("hide");
     }
 
 	public void ShowUI()
 	{
-        modelManagerControl.CallDeferred("show");
+        CallDeferred("show");
 	}
 
-
-	private void OnChooseModelDirectory()
+	private void OnContextSizeSliderChanged(double sliderValue)
 	{
-		GD.Print("Choosing model directory");
+		contextSize = (uint)Math.Pow(sliderValue, 2);
+		contextSizeLabel.Text = $"Context Size: {contextSize}";
+	}
+
+    private void OnNumGpuLayersSliderChanged(double sliderValue)
+    {
+
+    }
+
+    private void OnSelectModel()
+	{
 		ShowModelFileDialog();
 	}
 
@@ -66,33 +91,44 @@ public partial class ModelManager : Node
 		modelFileDialog.CallDeferred("popup_centered");
 	}
 
-
-	private async void OnModelSelected(string filePath)
+	private void OnModelSelected(string modelPath)
 	{
-		GD.Print("Model selected!");
-		await LoadModelAsync(filePath);
+		this.modelPath = modelPath;
+		selectedModelInfoLabel.Text = $"Current model selected: {modelPath}";
+    }
+
+	private async void OnLoadSelectedModel()
+	{
+        await LoadModelAsync(modelPath);
         EmitSignal(SignalName.OnModelLoaded);
     }
 
 	private async Task LoadModelAsync(string modelPath)
 	{
-		GD.Print($"Loading model from {modelPath}");
 		await Task.Run(() =>
 		{
-			modelParams = new ModelParams(modelPath)
+			var searchClientConfig = new SearchClientConfig
 			{
-				ContextSize = 4096, // This can be changed by the user according to memory usage and model capability
-				EmbeddingMode = true, // This must be set to true to generate embeddings for vector search
-				GpuLayerCount = -1 // Set your number of layers to offload to the GPU here, depending on VRAM available (you can mix CPU with GPU for hybrid inference)
+				MaxMatchesCount = 1,
+				AnswerTokens = 100,
 			};
-			model = LLamaWeights.LoadFromFile(modelParams);
-			embedder = new LLamaEmbedder(model, modelParams);
-			context = model.CreateContext(modelParams);
-			executor = new InteractiveExecutor(context);
-			session = new ChatSession(executor);
-			isModelLoaded = true;
+
+			modelKernel = new KernelMemoryBuilder().WithLLamaSharpDefaults(new LLamaSharpConfig(modelPath)
+			{
+				DefaultInferenceParams = new LLama.Common.InferenceParams()
+				{
+					AntiPrompts = new string[] { "\n\n" }
+				}
+			})
+			.WithSearchClientConfig(searchClientConfig)
+			.With(new TextPartitioningOptions
+			{
+				MaxTokensPerParagraph = 300,
+				MaxTokensPerLine = 100,
+				OverlappingTokens = 30
+			})
+			.Build();
 		});
-		GD.Print($"{modelPath} loaded\n");
         
     }
 
@@ -100,12 +136,9 @@ public partial class ModelManager : Node
 	{
 		await Task.Run(async () =>
 		{
-			await foreach (var text in session.ChatAsync(new ChatHistory.Message(AuthorRole.User, prompt), new InferenceParams { Temperature = 0.25f, AntiPrompts = ["<end>"] }))
+			await foreach (var text in session.ChatAsync(new ChatHistory.Message(AuthorRole.User, prompt), new InferenceParams { Temperature = 0.5f, AntiPrompts = ["\n\n"] }))
 			{
-				if (text != "<end>")
-				{
-					CallDeferred(nameof(DeferredEmitNewChatMessage), text);
-				}
+				CallDeferred(nameof(DeferredEmitNewChatMessage), text);
 			}
 		});
 	}

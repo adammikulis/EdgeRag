@@ -1,16 +1,17 @@
 using Godot;
 using System;
 
-public partial class ChatManager : Node
+public partial class ChatManager : Control
 {
 
     [Signal]
-    public delegate void ManageModelsButtonPressedEventHandler();
-
+    public delegate void OnManageModelsButtonPressedEventHandler();
     [Signal]
-    public delegate void OnPromptSubmitEventHandler(string prompt);
+    public delegate void OnManageDatabasesButtonPressedEventHandler();
+    [Signal]
+    public delegate void OnPromptSubmitButtonPressedEventHandler(string prompt);
 
-	private Button manageModelsButton, chatSubmitButton, startNewChat;
+	private Button manageDatabasesButton, manageModelsButton, promptSubmitButton, startNewChat;
 
     private Control chatManagerControl;
 
@@ -18,47 +19,45 @@ public partial class ChatManager : Node
     private RichTextLabel mainChatOutput;
 
 
-	// Called when the node enters the scene tree for the first time.
-	public override void _Ready()
-	{
-        chatManagerControl = GetNode<Control>("%ChatManagerControl");
-        chatSubmitButton = GetNode<Button>("%ChatSubmitButton");
+    // Called when the node enters the scene tree for the first time.
+    public override void _Ready()
+    {
+
+        promptSubmitButton = GetNode<Button>("%PromptSubmitButton");
         manageModelsButton = GetNode<Button>("%ManageModelsButton");
+        manageDatabasesButton = GetNode<Button>("%ManageDatabasesButton");
         mainChatInput = GetNode<LineEdit>("%MainChatInput");
         mainChatOutput = GetNode<RichTextLabel>("%MainOutputTextLabel");
 
-
-
-		manageModelsButton.Pressed += OnManageModelsButtonPressed;
-		chatSubmitButton.Pressed += OnPromptSubmitButtonPressed;
-	}
+        // LLMController listens for these signals, decouples so it doesn't have to know the actual button
+        manageModelsButton.Pressed += () => EmitSignal(SignalName.OnManageModelsButtonPressed);
+        manageDatabasesButton.Pressed += () => EmitSignal(SignalName.OnManageDatabasesButtonPressed);
+        promptSubmitButton.Pressed += PromptSubmitButtonPressed;
+    }
 
     public void HideUI()
     {
-        chatManagerControl.CallDeferred("hide");
-
-        GD.Print("Hiding UI for" + Name);
+        CallDeferred("hide");
     }
 
     public void ShowUI()
     {
-        chatManagerControl.CallDeferred("show");
+        CallDeferred("show");
     }
 
 
-    private void OnPromptSubmitButtonPressed()
+    private void PromptSubmitButtonPressed()
     {
-        mainChatOutput.Text = "";
         string prompt = mainChatInput.Text;
+        mainChatOutput.Text += $"\nPrompt:\n{prompt}\n\nResponse:\n";
         mainChatInput.Text = "";
         GD.Print($"Submitting prompt {prompt}");
-        EmitSignal(SignalName.OnPromptSubmit, prompt);
-        
+        EmitSignal(SignalName.OnPromptSubmitButtonPressed, prompt);
     }
 
-    private void OnManageModelsButtonPressed()
+    private void ManageDatabasesButtonPressed()
     {
-        EmitSignal(SignalName.ManageModelsButtonPressed);
+        
     }
 
     public void PrintModelOutput(string text)

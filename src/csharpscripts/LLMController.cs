@@ -7,24 +7,35 @@ public partial class LLMController : Node
 	private Button startProgramButton;
 	private ChatManager chatManager;
 	private ModelManager modelManager;
+	private DatabaseManager databaseManager;
 	private Control splashScreen;
 
 	public override void _Ready()
 	{
 		chatManager = GetNode<ChatManager>("%ChatManager");
 		modelManager = GetNode<ModelManager>("%ModelManager");
-		splashScreen = GetNode<Control>("%SplashScreen");
+        databaseManager = GetNode<DatabaseManager>("%DatabaseManager");
+
+        splashScreen = GetNode<Control>("%SplashScreen");
 		startProgramButton = GetNode<Button>("%StartProgramButton");
 
 		modelManager.OnModelLoaded += ManageChatState;
 		modelManager.NewChatMessage += chatManager.PrintModelOutput;
 
-		chatManager.ManageModelsButtonPressed += ManageModelState;
-		chatManager.OnPromptSubmit += OnPromptSubmit;
+		chatManager.OnManageModelsButtonPressed += ManageModelState;
+		chatManager.OnPromptSubmitButtonPressed += OnPromptSubmit;
+		chatManager.OnManageDatabasesButtonPressed += ManageDatabaseState;
+
 
 		startProgramButton.Pressed += OnStartProgramButtonPressed;
 
 		ShowSplashScreen();
+    }
+
+    private void ManageDatabaseState()
+    {
+        HideAllUI();
+		databaseManager.ShowUI();
     }
 
     private void OnPromptSubmit(string prompt)
@@ -37,6 +48,7 @@ public partial class LLMController : Node
 	{
 		chatManager.HideUI();
 		modelManager.HideUI();
+		databaseManager.HideUI();
 		splashScreen.CallDeferred("hide");
 	}
 

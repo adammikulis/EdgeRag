@@ -1,0 +1,129 @@
+[gd_scene load_steps=6 format=3 uid="uid://d3liusj36fbyd"]
+
+[ext_resource type="Script" path="res://src/csharpscripts/ChatManager.cs" id="1_jmeut"]
+[ext_resource type="Theme" uid="uid://c8i2vubjakfwj" path="res://resources/system_theme.tres" id="2_t8oej"]
+
+[sub_resource type="SystemFont" id="SystemFont_2spo7"]
+subpixel_positioning = 0
+
+[sub_resource type="Theme" id="Theme_fs6ip"]
+default_font = SubResource("SystemFont_2spo7")
+
+[sub_resource type="LabelSettings" id="LabelSettings_xvflj"]
+
+[node name="ChatManager" type="Control"]
+unique_name_in_owner = true
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_jmeut")
+
+[node name="ChatGridContainer" type="GridContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+columns = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="ChatGridContainer"]
+custom_minimum_size = Vector2(0, 500)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="MainOutputTextLabel" type="RichTextLabel" parent="ChatGridContainer/MarginContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(750, 0)
+layout_direction = 2
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+focus_mode = 2
+theme = SubResource("Theme_fs6ip")
+selection_enabled = true
+
+[node name="ButtonContainer" type="VBoxContainer" parent="ChatGridContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+alignment = 2
+
+[node name="GridContainer" type="GridContainer" parent="ChatGridContainer/ButtonContainer"]
+layout_mode = 2
+columns = 2
+
+[node name="CurrentModelTitleLabel" type="Label" parent="ChatGridContainer/ButtonContainer/GridContainer"]
+layout_mode = 2
+text = "Current Model:"
+label_settings = SubResource("LabelSettings_xvflj")
+
+[node name="CurrentModelLabel" type="Label" parent="ChatGridContainer/ButtonContainer/GridContainer"]
+layout_mode = 2
+label_settings = SubResource("LabelSettings_xvflj")
+
+[node name="ManageModelsButton" type="Button" parent="ChatGridContainer/ButtonContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 50)
+layout_mode = 2
+text = "Manage/Load Models"
+
+[node name="ManageConversationHistoryButton" type="Button" parent="ChatGridContainer/ButtonContainer"]
+visible = false
+custom_minimum_size = Vector2(0, 50)
+layout_mode = 2
+text = "Manage Conversation
+History"
+
+[node name="HBoxContainer" type="HBoxContainer" parent="ChatGridContainer/ButtonContainer"]
+custom_minimum_size = Vector2(0, 50)
+layout_mode = 2
+
+[node name="ManageDatabasesButton" type="Button" parent="ChatGridContainer/ButtonContainer/HBoxContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+text = "Manage Databases"
+
+[node name="UseDatabaseCheckBox" type="CheckBox" parent="ChatGridContainer/ButtonContainer/HBoxContainer"]
+layout_mode = 2
+disabled = true
+toggle_mode = false
+text = "Use Database"
+
+[node name="StartNewChatButton" type="Button" parent="ChatGridContainer/ButtonContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 50)
+layout_mode = 2
+text = "Start New Chat"
+
+[node name="SystemInfoLabel" type="RichTextLabel" parent="ChatGridContainer/ButtonContainer"]
+layout_mode = 2
+text = "System Information:"
+
+[node name="MainChatInputScrollContainer" type="ScrollContainer" parent="ChatGridContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="MainChatInput" type="LineEdit" parent="ChatGridContainer/MainChatInputScrollContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme = ExtResource("2_t8oej")
+
+[node name="PromptSubmitButton" type="Button" parent="ChatGridContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 0.25
+text = "Submit"
