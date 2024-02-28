@@ -7,13 +7,15 @@ public partial class ChatManager : Node
     [Signal]
     public delegate void ManageModelsButtonPressedEventHandler();
 
+    [Signal]
+    public delegate void OnPromptSubmitEventHandler(string prompt);
+
 	private Button manageModelsButton, chatSubmitButton, startNewChat;
-    [Export]
-    private VBoxContainer buttonContainer;
-    [Export]
-    private GridContainer chatGridContainer;
 
     private Control chatManagerControl;
+
+    private LineEdit mainChatInput;
+    private RichTextLabel mainChatOutput;
 
 
 	// Called when the node enters the scene tree for the first time.
@@ -22,10 +24,13 @@ public partial class ChatManager : Node
         chatManagerControl = GetNode<Control>("%ChatManagerControl");
         chatSubmitButton = GetNode<Button>("%ChatSubmitButton");
         manageModelsButton = GetNode<Button>("%ManageModelsButton");
+        mainChatInput = GetNode<LineEdit>("%MainChatInput");
+        mainChatOutput = GetNode<RichTextLabel>("%MainOutputTextLabel");
+
 
 
 		manageModelsButton.Pressed += OnManageModelsButtonPressed;
-		chatSubmitButton.Pressed += OnSubmitButtonPressed;
+		chatSubmitButton.Pressed += OnPromptSubmitButtonPressed;
 	}
 
     public void HideUI()
@@ -41,14 +46,24 @@ public partial class ChatManager : Node
     }
 
 
-    private void OnSubmitButtonPressed()
+    private void OnPromptSubmitButtonPressed()
     {
-        throw new NotImplementedException();
+        mainChatOutput.Text = "";
+        string prompt = mainChatInput.Text;
+        mainChatInput.Text = "";
+        GD.Print($"Submitting prompt {prompt}");
+        EmitSignal(SignalName.OnPromptSubmit, prompt);
+        
     }
 
     private void OnManageModelsButtonPressed()
     {
         EmitSignal(SignalName.ManageModelsButtonPressed);
+    }
+
+    public void PrintModelOutput(string text)
+    {
+        mainChatOutput.Text += text;
     }
 
 

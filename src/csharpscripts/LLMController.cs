@@ -17,17 +17,23 @@ public partial class LLMController : Node
 		startProgramButton = GetNode<Button>("%StartProgramButton");
 
 		modelManager.OnModelLoaded += ManageChatState;
-		chatManager.ManageModelsButtonPressed += ManageModelsState;
+		modelManager.NewChatMessage += chatManager.PrintModelOutput;
+
+		chatManager.ManageModelsButtonPressed += ManageModelState;
+		chatManager.OnPromptSubmit += OnPromptSubmit;
+
 		startProgramButton.Pressed += OnStartProgramButtonPressed;
 
-        //CallDeferred("ManageModelsState");
-        HideAllUI();
 		ShowSplashScreen();
     }
 
+    private void OnPromptSubmit(string prompt)
+    {
+        _ = modelManager.SubmitPromptAsync(prompt);
+    }
 
 
-	public void HideAllUI()
+    public void HideAllUI()
 	{
 		chatManager.HideUI();
 		modelManager.HideUI();
@@ -36,17 +42,16 @@ public partial class LLMController : Node
 
 	private void ShowSplashScreen()
 	{
-		splashScreen.CallDeferred("show");
+        HideAllUI();
+        splashScreen.CallDeferred("show");
 	}
 
 	private void OnStartProgramButtonPressed()
 	{
-		ManageModelsState();
+		ManageModelState();
 	}
 
-
-
-    private void ManageModelsState()
+    private void ManageModelState()
 	{
         HideAllUI();
         modelManager.ShowUI();

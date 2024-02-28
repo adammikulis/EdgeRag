@@ -83,7 +83,7 @@ public partial class ModelManager : Node
 			{
 				ContextSize = 4096, // This can be changed by the user according to memory usage and model capability
 				EmbeddingMode = true, // This must be set to true to generate embeddings for vector search
-				GpuLayerCount = 0 // Set your number of layers to offload to the GPU here, depending on VRAM available (you can mix CPU with GPU for hybrid inference)
+				GpuLayerCount = -1 // Set your number of layers to offload to the GPU here, depending on VRAM available (you can mix CPU with GPU for hybrid inference)
 			};
 			model = LLamaWeights.LoadFromFile(modelParams);
 			embedder = new LLamaEmbedder(model, modelParams);
