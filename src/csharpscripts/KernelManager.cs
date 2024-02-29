@@ -1,19 +1,20 @@
 using Godot;
-using LLama.Common;
 using LLama;
+using LLama.Common;
 using System;
 using System.Threading.Tasks;
+using LLamaSharp.KernelMemory;
 using Microsoft.KernelMemory;
 using Microsoft.KernelMemory.Configuration;
-using Microsoft.KernelMemory.Handlers;
-using LLama.Batched;
-using LLamaSharp.KernelMemory;
+using Microsoft.KernelMemory.ContentStorage.DevTools;
+using Microsoft.KernelMemory.FileSystem.DevTools;
+using Microsoft.KernelMemory.MemoryStorage.DevTools;
 
-public partial class ModelManager : Control
+public partial class KernelManager : Control
 {
 
     [Signal]
-    public delegate void OnModelLoadedEventHandler();
+    public delegate void OnChatButtonPressedEventHandler();
     [Signal]
     public delegate void NewChatMessageEventHandler(string message);
 
@@ -21,10 +22,10 @@ public partial class ModelManager : Control
 
 
     private FileDialog modelFileDialog;
-	private Button loadSelectedModelButton, selectModelButton;
+	private Button addFilesToDatabaseButton, loadDatabaseButton, saveDatabaseButton, loadSelectedModelButton, selectModelButton;
 	private HSlider contextSizeSlider, numGpuLayersSlider;
 	private Label contextSizeLabel, numGpuLayersLabel;
-	private RichTextLabel selectedModelInfoLabel;
+	private RichTextLabel currentFilesRichTextLabel, selectedModelRichTextLabel;
 
 
     private LLamaWeights model;
@@ -34,6 +35,8 @@ public partial class ModelManager : Control
 	private ChatSession session;
 	private InteractiveExecutor executor;
 	private string modelPath;
+	private string databaseStorageDirectoryPath;
+	private string filesToEmbedDirectoryPath;
 	private uint contextSize = 512;
 
 	private bool isModelLoaded = false;
@@ -42,15 +45,16 @@ public partial class ModelManager : Control
 	{
 		modelFileDialog = GetNode<FileDialog>("%ModelFileDialog");
 
-		selectModelButton = GetNode<Button>("%SelectModelButton");
+        currentFilesRichTextLabel = GetNode<RichTextLabel>("%CurrentFilesRichTextLabel");
+
+        selectModelButton = GetNode<Button>("%SelectModelButton");
 		loadSelectedModelButton = GetNode<Button>("%LoadSelectedModelButton");
 
 		contextSizeSlider = GetNode<HSlider>("%ContextSizeSlider");
 		numGpuLayersSlider = GetNode<HSlider>("%NumGpuLayersSlider");
-
 		contextSizeLabel = GetNode<Label>("%ContextSizeLabel");
 		numGpuLayersLabel = GetNode<Label>("%NumGpuLayersLabel");
-		selectedModelInfoLabel = GetNode<RichTextLabel>("%SelectedModelInfoLabel");
+		selectedModelRichTextLabel = GetNode<RichTextLabel>("%SelectedModelRichTextLabel");
 
 		contextSizeSlider.ValueChanged += OnContextSizeSliderChanged;
 
@@ -94,14 +98,19 @@ public partial class ModelManager : Control
 	private void OnModelSelected(string modelPath)
 	{
 		this.modelPath = modelPath;
-		selectedModelInfoLabel.Text = $"Current model selected: {modelPath}";
+		selectedModelRichTextLabel.Text = $"Current model selected: {modelPath}";
     }
 
 	private async void OnLoadSelectedModel()
 	{
         await LoadModelAsync(modelPath);
-        EmitSignal(SignalName.OnModelLoaded);
+        
     }
+
+	private void OnChatButtonPressed()
+	{
+        EmitSignal(SignalName.OnChatButtonPressed);
+	}
 
 	private async Task LoadModelAsync(string modelPath)
 	{

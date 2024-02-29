@@ -21,6 +21,18 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_jmeut")
 
+[node name="PanelContainer" type="PanelContainer" parent="."]
+custom_minimum_size = Vector2(0, 50)
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+grow_horizontal = 2
+
+[node name="Label" type="Label" parent="PanelContainer"]
+layout_mode = 2
+text = "Chat Mode"
+horizontal_alignment = 1
+
 [node name="ChatGridContainer" type="GridContainer" parent="."]
 layout_mode = 1
 anchors_preset = 15
@@ -70,40 +82,11 @@ label_settings = SubResource("LabelSettings_xvflj")
 layout_mode = 2
 label_settings = SubResource("LabelSettings_xvflj")
 
-[node name="ManageModelsButton" type="Button" parent="ChatGridContainer/ButtonContainer"]
+[node name="ManageKernelButton" type="Button" parent="ChatGridContainer/ButtonContainer"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 50)
 layout_mode = 2
-text = "Manage/Load Models"
-
-[node name="ManageConversationHistoryButton" type="Button" parent="ChatGridContainer/ButtonContainer"]
-visible = false
-custom_minimum_size = Vector2(0, 50)
-layout_mode = 2
-text = "Manage Conversation
-History"
-
-[node name="HBoxContainer" type="HBoxContainer" parent="ChatGridContainer/ButtonContainer"]
-custom_minimum_size = Vector2(0, 50)
-layout_mode = 2
-
-[node name="ManageDatabasesButton" type="Button" parent="ChatGridContainer/ButtonContainer/HBoxContainer"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(200, 0)
-layout_mode = 2
-text = "Manage Databases"
-
-[node name="UseDatabaseCheckBox" type="CheckBox" parent="ChatGridContainer/ButtonContainer/HBoxContainer"]
-layout_mode = 2
-disabled = true
-toggle_mode = false
-text = "Use Database"
-
-[node name="StartNewChatButton" type="Button" parent="ChatGridContainer/ButtonContainer"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 50)
-layout_mode = 2
-text = "Start New Chat"
+text = "Manage Kernel (Data/Models)"
 
 [node name="SystemInfoLabel" type="RichTextLabel" parent="ChatGridContainer/ButtonContainer"]
 layout_mode = 2

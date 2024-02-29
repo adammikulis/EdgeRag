@@ -6,49 +6,41 @@ public partial class LLMController : Node
 
 	private Button startProgramButton;
 	private ChatManager chatManager;
-	private ModelManager modelManager;
-	private DatabaseManager databaseManager;
+	private KernelManager kernelManager;
 	private Control splashScreen;
 
 	public override void _Ready()
 	{
 		chatManager = GetNode<ChatManager>("%ChatManager");
-		modelManager = GetNode<ModelManager>("%ModelManager");
-        databaseManager = GetNode<DatabaseManager>("%DatabaseManager");
+		kernelManager = GetNode<KernelManager>("%KernelManager");
 
         splashScreen = GetNode<Control>("%SplashScreen");
 		startProgramButton = GetNode<Button>("%StartProgramButton");
 
-		modelManager.OnModelLoaded += ManageChatState;
-		modelManager.NewChatMessage += chatManager.PrintModelOutput;
+		// These are custom signals from the KernelManager to decouple operations with a state machine
+		kernelManager.OnChatButtonPressed += ManageChatState;
+		kernelManager.NewChatMessage += chatManager.PrintModelOutput;
 
-		chatManager.OnManageModelsButtonPressed += ManageModelState;
+        // These are custom signals from the ChatManager to decouple operations with a state machine
+        chatManager.OnManageKernelButtonPressed += ManageKernelState;
 		chatManager.OnPromptSubmitButtonPressed += OnPromptSubmit;
-		chatManager.OnManageDatabasesButtonPressed += ManageDatabaseState;
 
-
+		// For splash screen
 		startProgramButton.Pressed += OnStartProgramButtonPressed;
-
 		ShowSplashScreen();
     }
 
-    private void ManageDatabaseState()
-    {
-        HideAllUI();
-		databaseManager.ShowUI();
-    }
-
+	// Wrapper for async method to avoid error with signal calling
     private void OnPromptSubmit(string prompt)
     {
-        _ = modelManager.SubmitPromptAsync(prompt);
+        _ = kernelManager.SubmitPromptAsync(prompt);
     }
 
 
     public void HideAllUI()
 	{
 		chatManager.HideUI();
-		modelManager.HideUI();
-		databaseManager.HideUI();
+		kernelManager.HideUI();
 		splashScreen.CallDeferred("hide");
 	}
 
@@ -60,13 +52,13 @@ public partial class LLMController : Node
 
 	private void OnStartProgramButtonPressed()
 	{
-		ManageModelState();
+		ManageKernelState();
 	}
 
-    private void ManageModelState()
+    private void ManageKernelState()
 	{
         HideAllUI();
-        modelManager.ShowUI();
+        kernelManager.ShowUI();
     }
 
 	private void ManageChatState()

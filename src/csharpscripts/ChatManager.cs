@@ -5,13 +5,11 @@ public partial class ChatManager : Control
 {
 
     [Signal]
-    public delegate void OnManageModelsButtonPressedEventHandler();
-    [Signal]
-    public delegate void OnManageDatabasesButtonPressedEventHandler();
+    public delegate void OnManageKernelButtonPressedEventHandler();
     [Signal]
     public delegate void OnPromptSubmitButtonPressedEventHandler(string prompt);
 
-	private Button manageDatabasesButton, manageModelsButton, promptSubmitButton, startNewChat;
+	private Button manageDatabasesButton, manageKernelButton, promptSubmitButton, startNewChat;
 
     private Control chatManagerControl;
 
@@ -24,14 +22,12 @@ public partial class ChatManager : Control
     {
 
         promptSubmitButton = GetNode<Button>("%PromptSubmitButton");
-        manageModelsButton = GetNode<Button>("%ManageModelsButton");
-        manageDatabasesButton = GetNode<Button>("%ManageDatabasesButton");
+        manageKernelButton = GetNode<Button>("%ManageKernelButton");
         mainChatInput = GetNode<LineEdit>("%MainChatInput");
         mainChatOutput = GetNode<RichTextLabel>("%MainOutputTextLabel");
 
         // LLMController listens for these signals, decouples so it doesn't have to know the actual button
-        manageModelsButton.Pressed += () => EmitSignal(SignalName.OnManageModelsButtonPressed);
-        manageDatabasesButton.Pressed += () => EmitSignal(SignalName.OnManageDatabasesButtonPressed);
+        manageKernelButton.Pressed += () => EmitSignal(SignalName.OnManageKernelButtonPressed);
         promptSubmitButton.Pressed += PromptSubmitButtonPressed;
     }
 
@@ -53,11 +49,6 @@ public partial class ChatManager : Control
         mainChatInput.Text = "";
         GD.Print($"Submitting prompt {prompt}");
         EmitSignal(SignalName.OnPromptSubmitButtonPressed, prompt);
-    }
-
-    private void ManageDatabasesButtonPressed()
-    {
-        
     }
 
     public void PrintModelOutput(string text)
