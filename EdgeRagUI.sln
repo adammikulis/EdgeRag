@@ -1,12 +1,15 @@
-﻿Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EdgeRagUI", "EdgeRagUI.csproj", "{A7862CCD-D973-43B4-87E7-36FBA94411EA}"
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.9.34616.47
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EdgeRagUI", "EdgeRagUI.csproj", "{A7862CCD-D973-43B4-87E7-36FBA94411EA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-	Debug|Any CPU = Debug|Any CPU
-	ExportDebug|Any CPU = ExportDebug|Any CPU
-	ExportRelease|Any CPU = ExportRelease|Any CPU
+		Debug|Any CPU = Debug|Any CPU
+		ExportDebug|Any CPU = ExportDebug|Any CPU
+		ExportRelease|Any CPU = ExportRelease|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{A7862CCD-D973-43B4-87E7-36FBA94411EA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -15,5 +18,8 @@ Global
 		{A7862CCD-D973-43B4-87E7-36FBA94411EA}.ExportDebug|Any CPU.Build.0 = ExportDebug|Any CPU
 		{A7862CCD-D973-43B4-87E7-36FBA94411EA}.ExportRelease|Any CPU.ActiveCfg = ExportRelease|Any CPU
 		{A7862CCD-D973-43B4-87E7-36FBA94411EA}.ExportRelease|Any CPU.Build.0 = ExportRelease|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
 	EndGlobalSection
 EndGlobal

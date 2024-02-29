@@ -26,9 +26,9 @@ public partial class KernelManager : Control
     private ModelManager modelManager;
     private DatabaseManager databaseManager;
 
-    private uint contextSize = 2048;
+    private uint contextSize = 4096;
     private uint seed = 0;
-    private int gpuLayerCount = 5;
+    private int gpuLayerCount = -1;
 
     private string modelPath = null;
     private string databaseFolderPath = null;
@@ -138,7 +138,7 @@ public partial class KernelManager : Control
 
         SearchClientConfig searchClientConfig = new()
         {
-            MaxMatchesCount = 3,
+            MaxMatchesCount = 1,
             AnswerTokens = 256,
         };
 
@@ -160,8 +160,6 @@ public partial class KernelManager : Control
             Directory = databaseFolderPath,
             StorageType = FileSystemTypes.Disk,
         };
-
-        Console.WriteLine($"Kernel memory folder: {databaseFolderPath}");
 
         return new KernelMemoryBuilder()
             .WithSimpleFileStorage(storageConfig)

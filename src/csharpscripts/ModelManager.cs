@@ -11,6 +11,7 @@ public partial class ModelManager : MarginContainer
     private Button selectModelButton;
     private string modelFilePath;
     public uint contextSize = 512;
+    public int gpuLayerCount = -1;
 
     private HSlider contextSizeSlider, numGpuLayersSlider;
     private Label contextSizeLabel, numGpuLayersLabel;
