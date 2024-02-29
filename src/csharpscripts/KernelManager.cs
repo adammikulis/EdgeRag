@@ -9,6 +9,7 @@ using Microsoft.KernelMemory.Configuration;
 using Microsoft.KernelMemory.ContentStorage.DevTools;
 using Microsoft.KernelMemory.FileSystem.DevTools;
 using Microsoft.KernelMemory.MemoryStorage.DevTools;
+using System.Diagnostics;
 
 public partial class KernelManager : Control
 {
@@ -18,15 +19,11 @@ public partial class KernelManager : Control
     [Signal]
     public delegate void NewChatMessageEventHandler(string message);
 
-	public IKernelMemory modelKernel;
+    private Button chatButton, initializeKernelButton;
 
 
-    private FileDialog modelFileDialog;
-	private Button addFilesToDatabaseButton, loadDatabaseButton, saveDatabaseButton, loadSelectedModelButton, selectModelButton;
-	private HSlider contextSizeSlider, numGpuLayersSlider;
-	private Label contextSizeLabel, numGpuLayersLabel;
-	private RichTextLabel currentFilesRichTextLabel, selectedModelRichTextLabel;
 
+	public IKernelMemory memory;
 
     private LLamaWeights model;
 	private LLamaEmbedder embedder;
@@ -34,114 +31,143 @@ public partial class KernelManager : Control
 	private ModelParams modelParams;
 	private ChatSession session;
 	private InteractiveExecutor executor;
-	private string modelPath;
-	private string databaseStorageDirectoryPath;
-	private string filesToEmbedDirectoryPath;
-	private uint contextSize = 512;
 
-	private bool isModelLoaded = false;
+    private ModelManager modelManager;
+    private DatabaseManager databaseManager;
+
+    private uint contextSize = 2048;
+    private uint seed = 0;
+    private int gpuLayerCount = 0;
+
+    private string modelPath = null;
+    private string databaseFolderPath = null;
+	private string[] filesToIngest;
+	
+
+	private bool validModelPath = false;
+    private bool validDatabaseFolderPath = false;
 
 	public override void _Ready()
 	{
-		modelFileDialog = GetNode<FileDialog>("%ModelFileDialog");
+        chatButton = GetNode<Button>("%ChatButton");
+        initializeKernelButton = GetNode<Button>("%InitializeKernelButton");
 
-        currentFilesRichTextLabel = GetNode<RichTextLabel>("%CurrentFilesRichTextLabel");
 
-        selectModelButton = GetNode<Button>("%SelectModelButton");
-		loadSelectedModelButton = GetNode<Button>("%LoadSelectedModelButton");
+        modelManager = GetNode<ModelManager>("%ModelManager");
+        databaseManager = GetNode<DatabaseManager>("%DatabaseManager");
 
-		contextSizeSlider = GetNode<HSlider>("%ContextSizeSlider");
-		numGpuLayersSlider = GetNode<HSlider>("%NumGpuLayersSlider");
-		contextSizeLabel = GetNode<Label>("%ContextSizeLabel");
-		numGpuLayersLabel = GetNode<Label>("%NumGpuLayersLabel");
-		selectedModelRichTextLabel = GetNode<RichTextLabel>("%SelectedModelRichTextLabel");
+        modelManager.OnModelSelected += OnModelSelected;
+        databaseManager.OnDatabaseFolderSelected += OnDatabaseFolderSelected;
 
-		contextSizeSlider.ValueChanged += OnContextSizeSliderChanged;
-
-		selectModelButton.Pressed += OnSelectModel;
-		modelFileDialog.FileSelected += OnModelSelected;
-		loadSelectedModelButton.Pressed += OnLoadSelectedModel;
-	}
-
-	public void HideUI()
-	{
-        CallDeferred("hide");
-        modelFileDialog.CallDeferred("hide");
     }
 
-	public void ShowUI()
-	{
-        CallDeferred("show");
-	}
-
-	private void OnContextSizeSliderChanged(double sliderValue)
-	{
-		contextSize = (uint)Math.Pow(sliderValue, 2);
-		contextSizeLabel.Text = $"Context Size: {contextSize}";
-	}
-
-    private void OnNumGpuLayersSliderChanged(double sliderValue)
+    private void OnDatabaseFolderSelected(string databaseFolderPath)
     {
-
+        this.databaseFolderPath = databaseFolderPath;
+        validDatabaseFolderPath = true;
+        if (validModelPath && validDatabaseFolderPath)
+        {
+            initializeKernelButton.Disabled = false;
+        }
     }
 
-    private void OnSelectModel()
-	{
-		ShowModelFileDialog();
-	}
-
-	public void ShowModelFileDialog()
-	{
-		modelFileDialog.CallDeferred("popup_centered");
-	}
-
-	private void OnModelSelected(string modelPath)
-	{
-		this.modelPath = modelPath;
-		selectedModelRichTextLabel.Text = $"Current model selected: {modelPath}";
+    private void OnModelSelected(string modelPath)
+    {
+        this.modelPath = modelPath;
+        validModelPath = true;
+        if (validModelPath && validDatabaseFolderPath)
+        {
+            initializeKernelButton.Disabled = false;
+        }
     }
 
-	private async void OnLoadSelectedModel()
-	{
-        await LoadModelAsync(modelPath);
-        
+    public void HideUI()
+    {
+        CallDeferred("hide");
     }
 
-	private void OnChatButtonPressed()
-	{
-        EmitSignal(SignalName.OnChatButtonPressed);
-	}
+    public void ShowUI()
+    {
+        CallDeferred("show");
+    }
 
-	private async Task LoadModelAsync(string modelPath)
+
+	private async Task LoadKernelAsync()
 	{
 		await Task.Run(() =>
 		{
-			var searchClientConfig = new SearchClientConfig
-			{
-				MaxMatchesCount = 1,
-				AnswerTokens = 100,
-			};
+            memory = CreateMemoryWithLocalStorage();
 
-			modelKernel = new KernelMemoryBuilder().WithLLamaSharpDefaults(new LLamaSharpConfig(modelPath)
-			{
-				DefaultInferenceParams = new LLama.Common.InferenceParams()
-				{
-					AntiPrompts = new string[] { "\n\n" }
-				}
-			})
-			.WithSearchClientConfig(searchClientConfig)
-			.With(new TextPartitioningOptions
-			{
-				MaxTokensPerParagraph = 300,
-				MaxTokensPerLine = 100,
-				OverlappingTokens = 30
-			})
-			.Build();
-		});
+
+        });
         
     }
 
-	public async Task SubmitPromptAsync(string prompt)
+    private IKernelMemory CreateMemoryWithLocalStorage()
+    {
+        LLama.Common.InferenceParams infParams = new() 
+        { 
+            AntiPrompts = ["\n\n"] 
+        };
+
+        LLamaSharpConfig lsConfig = new(modelPath)
+        {
+            ContextSize = contextSize,
+            Seed = seed,
+            GpuLayerCount = gpuLayerCount,
+            DefaultInferenceParams = infParams 
+        };
+
+        SearchClientConfig searchClientConfig = new()
+        {
+            MaxMatchesCount = 3,
+            AnswerTokens = 256,
+        };
+
+        TextPartitioningOptions parseOptions = new()
+        {
+            MaxTokensPerParagraph = 300,
+            MaxTokensPerLine = 100,
+            OverlappingTokens = 30
+        };
+
+        SimpleFileStorageConfig storageConfig = new()
+        {
+            Directory = databaseFolderPath,
+            StorageType = FileSystemTypes.Disk,
+        };
+
+        SimpleVectorDbConfig vectorDbConfig = new()
+        {
+            Directory = databaseFolderPath,
+            StorageType = FileSystemTypes.Disk,
+        };
+
+        Console.WriteLine($"Kernel memory folder: {databaseFolderPath}");
+
+        return new KernelMemoryBuilder()
+            .WithSimpleFileStorage(storageConfig)
+            .WithSimpleVectorDb(vectorDbConfig)
+            .WithLLamaSharpDefaults(lsConfig)
+            .WithSearchClientConfig(searchClientConfig)
+            .With(parseOptions)
+            .Build();
+    }
+
+    private async Task IngestDocumentsAsync()
+    {
+        for (int i = 0; i < filesToIngest.Length; i++)
+        {
+            string path = filesToIngest[i];
+            Stopwatch sw = Stopwatch.StartNew();
+            GD.Print($"Importing {i + 1} of {filesToIngest.Length}: {path}");
+            await memory.ImportDocumentAsync(path, steps: Constants.PipelineWithoutSummary);
+            GD.Print($"Completed in {sw.Elapsed}\n");
+        }
+    }
+
+
+    public async Task SubmitPromptAsync(string prompt)
 	{
 		await Task.Run(async () =>
 		{

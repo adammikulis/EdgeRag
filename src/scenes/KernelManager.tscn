@@ -1,6 +1,8 @@
-[gd_scene load_steps=2 format=3 uid="uid://xc0u42fe13b8"]
+[gd_scene load_steps=4 format=3 uid="uid://xc0u42fe13b8"]
 
+[ext_resource type="Script" path="res://src/csharpscripts/ModelManager.cs" id="1_f8g1q"]
 [ext_resource type="Script" path="res://src/csharpscripts/KernelManager.cs" id="1_xmhyj"]
+[ext_resource type="Script" path="res://src/csharpscripts/DatabaseManager.cs" id="2_ikfgj"]
 
 [node name="KernelManager" type="Control"]
 unique_name_in_owner = true
@@ -33,129 +35,48 @@ horizontal_alignment = 1
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="DatabaseMarginContainer" type="MarginContainer" parent="VBoxContainer/HBoxContainer"]
+[node name="DatabaseManager" type="MarginContainer" parent="VBoxContainer/HBoxContainer"]
+unique_name_in_owner = true
 layout_mode = 2
-theme_override_constants/margin_left = 10
-theme_override_constants/margin_top = 10
-theme_override_constants/margin_right = 10
-theme_override_constants/margin_bottom = 10
+size_flags_horizontal = 3
+theme_override_constants/margin_left = 5
+theme_override_constants/margin_top = 5
+theme_override_constants/margin_right = 5
+theme_override_constants/margin_bottom = 5
+script = ExtResource("2_ikfgj")
 
-[node name="DatabaseVBoxContainer" type="VBoxContainer" parent="VBoxContainer/HBoxContainer/DatabaseMarginContainer"]
-custom_minimum_size = Vector2(600, 0)
+[node name="DatabaseVBoxContainer" type="VBoxContainer" parent="VBoxContainer/HBoxContainer/DatabaseManager"]
 layout_mode = 2
 size_flags_horizontal = 3
 alignment = 2
 
-[node name="MarginContainer" type="MarginContainer" parent="VBoxContainer/HBoxContainer/DatabaseMarginContainer/DatabaseVBoxContainer"]
-layout_mode = 2
-
-[node name="CurrentFilesRichTextLabel" type="RichTextLabel" parent="VBoxContainer/HBoxContainer/DatabaseMarginContainer/DatabaseVBoxContainer/MarginContainer"]
+[node name="CurrentFilesRichTextLabel" type="RichTextLabel" parent="VBoxContainer/HBoxContainer/DatabaseManager/DatabaseVBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
 text = "Current Files in Database:"
 fit_content = true
 
-[node name="LoadDatabaseButton" type="Button" parent="VBoxContainer/HBoxContainer/DatabaseMarginContainer/DatabaseVBoxContainer"]
-layout_mode = 2
-text = "Load Files Into Database"
-
-[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer/HBoxContainer/DatabaseMarginContainer/DatabaseVBoxContainer"]
-layout_mode = 2
-
-[node name="LoadDatabaseButton" type="Button" parent="VBoxContainer/HBoxContainer/DatabaseMarginContainer/DatabaseVBoxContainer/HBoxContainer"]
+[node name="CurrentDatabaseFolderRichTextLabel" type="RichTextLabel" parent="VBoxContainer/HBoxContainer/DatabaseManager/DatabaseVBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
-size_flags_horizontal = 3
-text = "Load Database"
-
-[node name="SaveDatabaseButton" type="Button" parent="VBoxContainer/HBoxContainer/DatabaseMarginContainer/DatabaseVBoxContainer/HBoxContainer"]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_horizontal = 3
-text = "Save Database"
-
-[node name="ModelMarginContainer" type="MarginContainer" parent="VBoxContainer/HBoxContainer"]
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_constants/margin_left = 10
-theme_override_constants/margin_top = 10
-theme_override_constants/margin_right = 10
-theme_override_constants/margin_bottom = 10
-
-[node name="ModelVBoxContainer" type="VBoxContainer" parent="VBoxContainer/HBoxContainer/ModelMarginContainer"]
-custom_minimum_size = Vector2(300, 0)
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 8
-theme_override_constants/separation = 5
-
-[node name="SelectedModelInfoLabel" type="RichTextLabel" parent="VBoxContainer/HBoxContainer/ModelMarginContainer/ModelVBoxContainer"]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_vertical = 3
-text = "Selected Model:"
+text = "Current Database Folder:"
 fit_content = true
 
-[node name="ContextSizeLabel" type="Label" parent="VBoxContainer/HBoxContainer/ModelMarginContainer/ModelVBoxContainer"]
+[node name="AddFilesToDatabaseButton" type="Button" parent="VBoxContainer/HBoxContainer/DatabaseManager/DatabaseVBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "Context Size:"
+text = "Add File(s) to Database"
 
-[node name="ContextSizeSlider" type="HSlider" parent="VBoxContainer/HBoxContainer/ModelMarginContainer/ModelVBoxContainer"]
-unique_name_in_owner = true
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer/HBoxContainer/DatabaseManager/DatabaseVBoxContainer"]
 layout_mode = 2
-max_value = 6.0
-value = 3.0
-tick_count = 7
 
-[node name="NumGpuLayersLabel" type="Label" parent="VBoxContainer/HBoxContainer/ModelMarginContainer/ModelVBoxContainer"]
+[node name="ChooseDatabaseFolderButton" type="Button" parent="VBoxContainer/HBoxContainer/DatabaseManager/DatabaseVBoxContainer/HBoxContainer"]
 unique_name_in_owner = true
-layout_mode = 2
-text = "Number of GPU Layers:"
-
-[node name="NumGpuLayersSlider" type="HSlider" parent="VBoxContainer/HBoxContainer/ModelMarginContainer/ModelVBoxContainer"]
-unique_name_in_owner = true
-layout_mode = 2
-max_value = 33.0
-value = 17.0
-tick_count = 34
-
-[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer/HBoxContainer/ModelMarginContainer/ModelVBoxContainer"]
-layout_mode = 2
-size_flags_vertical = 3
-
-[node name="SelectModelButton" type="Button" parent="VBoxContainer/HBoxContainer/ModelMarginContainer/ModelVBoxContainer/HBoxContainer"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 75)
 layout_mode = 2
 size_flags_horizontal = 3
-text = "Select a Model"
+text = "Choose Database Folder"
 
-[node name="LoadSelectedModelButton" type="Button" parent="VBoxContainer/HBoxContainer/ModelMarginContainer/ModelVBoxContainer/HBoxContainer"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 75)
-layout_mode = 2
-size_flags_horizontal = 3
-text = "Load Selected Model"
-
-[node name="ChatButton" type="Button" parent="VBoxContainer/HBoxContainer/ModelMarginContainer/ModelVBoxContainer/HBoxContainer"]
-layout_mode = 2
-size_flags_horizontal = 3
-text = "Chat"
-
-[node name="ModelFileDialog" type="FileDialog" parent="."]
-unique_name_in_owner = true
-title = "Load a Language Model"
-initial_position = 2
-size = Vector2i(500, 500)
-ok_button_text = "Open"
-dialog_hide_on_ok = true
-mode_overrides_title = false
-file_mode = 0
-access = 2
-use_native_dialog = true
-
-[node name="LoadFilesFileDialog" type="FileDialog" parent="."]
+[node name="AddFilesFileDialog" type="FileDialog" parent="VBoxContainer/HBoxContainer/DatabaseManager"]
 unique_name_in_owner = true
 title = "Add Files to Database"
 initial_position = 2
@@ -167,16 +88,107 @@ access = 2
 show_hidden_files = true
 use_native_dialog = true
 
-[node name="LoadDatabaseFileDialog" type="FileDialog" parent="."]
+[node name="ChooseDatabaseFolderFileDialog" type="FileDialog" parent="VBoxContainer/HBoxContainer/DatabaseManager"]
 unique_name_in_owner = true
 title = "Add File(s) to Database"
 size = Vector2i(500, 500)
-ok_button_text = "Add File(s) to Database"
+ok_button_text = "Select Current Folder"
+mode_overrides_title = false
+file_mode = 2
+access = 2
+use_native_dialog = true
+
+[node name="ModelManager" type="MarginContainer" parent="VBoxContainer/HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/margin_left = 5
+theme_override_constants/margin_top = 5
+theme_override_constants/margin_right = 5
+theme_override_constants/margin_bottom = 5
+script = ExtResource("1_f8g1q")
+
+[node name="ModelVBoxContainer" type="VBoxContainer" parent="VBoxContainer/HBoxContainer/ModelManager"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 8
+theme_override_constants/separation = 5
+
+[node name="SelectedModelRichTextLabel" type="RichTextLabel" parent="VBoxContainer/HBoxContainer/ModelManager/ModelVBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+text = "Selected Model:"
+fit_content = true
+
+[node name="ContextSizeLabel" type="Label" parent="VBoxContainer/HBoxContainer/ModelManager/ModelVBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Context Size:"
+
+[node name="ContextSizeSlider" type="HSlider" parent="VBoxContainer/HBoxContainer/ModelManager/ModelVBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+max_value = 6.0
+value = 3.0
+tick_count = 7
+
+[node name="NumGpuLayersLabel" type="Label" parent="VBoxContainer/HBoxContainer/ModelManager/ModelVBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Number of GPU Layers:"
+
+[node name="NumGpuLayersSlider" type="HSlider" parent="VBoxContainer/HBoxContainer/ModelManager/ModelVBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+max_value = 33.0
+value = 17.0
+tick_count = 34
+
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer/HBoxContainer/ModelManager/ModelVBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="SelectModelButton" type="Button" parent="VBoxContainer/HBoxContainer/ModelManager/ModelVBoxContainer/HBoxContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 75)
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Select a Model"
+
+[node name="ModelFileDialog" type="FileDialog" parent="VBoxContainer/HBoxContainer/ModelManager"]
+unique_name_in_owner = true
+title = "Load a Language Model"
+initial_position = 2
+size = Vector2i(500, 500)
+ok_button_text = "Open"
+dialog_hide_on_ok = true
 mode_overrides_title = false
 file_mode = 0
 access = 2
 use_native_dialog = true
 
-[node name="SaveDatabaseFileDialog" type="FileDialog" parent="."]
+[node name="MarginContainer" type="MarginContainer" parent="VBoxContainer"]
+layout_mode = 2
+theme_override_constants/margin_left = 5
+theme_override_constants/margin_right = 5
+theme_override_constants/margin_bottom = 5
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="VBoxContainer/MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="InitializeKernelButton" type="Button" parent="VBoxContainer/MarginContainer/HBoxContainer2"]
 unique_name_in_owner = true
-size = Vector2i(312, 154)
+custom_minimum_size = Vector2(0, 50)
+layout_mode = 2
+size_flags_horizontal = 3
+disabled = true
+text = "Initialize Kernel (must select Database and Model first)"
+
+[node name="ChatButton" type="Button" parent="VBoxContainer/MarginContainer/HBoxContainer2"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+disabled = true
+text = "Chat (must initialize Kernel first)"
