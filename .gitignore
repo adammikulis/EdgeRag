@@ -3,6 +3,8 @@
 .godot/
 .vs
 .vscode
+databases
+files
 models
 
 ## Ignore Visual Studio temporary files, build results, and

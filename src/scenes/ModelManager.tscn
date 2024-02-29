@@ -1,0 +1,80 @@
+[gd_scene load_steps=2 format=3 uid="uid://3h8v1anmcvva"]
+
+[ext_resource type="Script" path="res://src/csharpscripts/ModelManager.cs" id="1_o5r8k"]
+
+[node name="ModelManager" type="MarginContainer"]
+size_flags_horizontal = 3
+theme_override_constants/margin_left = 5
+theme_override_constants/margin_top = 5
+theme_override_constants/margin_right = 5
+theme_override_constants/margin_bottom = 5
+script = ExtResource("1_o5r8k")
+
+[node name="ModelVBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 8
+theme_override_constants/separation = 5
+
+[node name="MarginContainer" type="MarginContainer" parent="ModelVBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/margin_bottom = 10
+
+[node name="VBoxContainer" type="VBoxContainer" parent="ModelVBoxContainer/MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 5
+
+[node name="SelectedModelRichTextLabel" type="RichTextLabel" parent="ModelVBoxContainer/MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+text = "Selected Model:"
+fit_content = true
+
+[node name="ContextSizeLabel" type="Label" parent="ModelVBoxContainer/MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Context Size:"
+
+[node name="ContextSizeSlider" type="HSlider" parent="ModelVBoxContainer/MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+max_value = 6.0
+value = 3.0
+tick_count = 7
+
+[node name="NumGpuLayersLabel" type="Label" parent="ModelVBoxContainer/MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Number of GPU Layers:"
+
+[node name="NumGpuLayersSlider" type="HSlider" parent="ModelVBoxContainer/MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+max_value = 33.0
+value = 17.0
+tick_count = 34
+
+[node name="HBoxContainer" type="HBoxContainer" parent="ModelVBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="SelectModelButton" type="Button" parent="ModelVBoxContainer/HBoxContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 75)
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Select a Model"
+
+[node name="ModelFileDialog" type="FileDialog" parent="."]
+unique_name_in_owner = true
+title = "Load a Language Model"
+initial_position = 2
+size = Vector2i(500, 500)
+ok_button_text = "Open"
+dialog_hide_on_ok = true
+mode_overrides_title = false
+file_mode = 0
+access = 2
+use_native_dialog = true

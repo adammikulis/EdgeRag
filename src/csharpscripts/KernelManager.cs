@@ -19,29 +19,20 @@ public partial class KernelManager : Control
     [Signal]
     public delegate void NewChatMessageEventHandler(string message);
 
-    private Button chatButton, initializeKernelButton;
-
-
+    private Button chatButton, initializeKernelButton, ingestFilesButton;
 
 	public IKernelMemory memory;
-
-    private LLamaWeights model;
-	private LLamaEmbedder embedder;
-	private LLamaContext context;
-	private ModelParams modelParams;
-	private ChatSession session;
-	private InteractiveExecutor executor;
 
     private ModelManager modelManager;
     private DatabaseManager databaseManager;
 
     private uint contextSize = 2048;
     private uint seed = 0;
-    private int gpuLayerCount = 0;
+    private int gpuLayerCount = 5;
 
     private string modelPath = null;
     private string databaseFolderPath = null;
-	private string[] filesToIngest;
+	private string[] filePaths;
 	
 
 	private bool validModelPath = false;
@@ -51,15 +42,43 @@ public partial class KernelManager : Control
 	{
         chatButton = GetNode<Button>("%ChatButton");
         initializeKernelButton = GetNode<Button>("%InitializeKernelButton");
-
+        ingestFilesButton = GetNode<Button>("%IngestFilesButton");
 
         modelManager = GetNode<ModelManager>("%ModelManager");
         databaseManager = GetNode<DatabaseManager>("%DatabaseManager");
 
         modelManager.OnModelSelected += OnModelSelected;
         databaseManager.OnDatabaseFolderSelected += OnDatabaseFolderSelected;
+        databaseManager.OnAddFilesToDatabase += OnAddFilesToDatabase;
 
+        initializeKernelButton.Pressed += OnInitializeKernelButtonPressed;
+        ingestFilesButton.Pressed += async () => await IngestDocumentsAsync();
+        chatButton.Pressed += () => EmitSignal(SignalName.OnChatButtonPressed);
     }
+
+
+    private void OnAddFilesToDatabase(string[] filePaths)
+    {
+        this.filePaths = filePaths;
+    }
+
+    private async void OnIngestFilesButtonPressed()
+    {
+        await IngestDocumentsAsync();
+    }
+
+    private async void OnDatabaseProcessFiles()
+    {
+        await IngestDocumentsAsync();
+    }
+
+    private async void OnInitializeKernelButtonPressed()
+    {
+        await InitializeKernelAsync();
+        ingestFilesButton.Disabled = false;
+        chatButton.Disabled = false;
+    }
+
 
     private void OnDatabaseFolderSelected(string databaseFolderPath)
     {
@@ -92,15 +111,14 @@ public partial class KernelManager : Control
     }
 
 
-	private async Task LoadKernelAsync()
+	private async Task InitializeKernelAsync()
 	{
 		await Task.Run(() =>
 		{
             memory = CreateMemoryWithLocalStorage();
 
-
         });
-        
+
     }
 
     private IKernelMemory CreateMemoryWithLocalStorage()
@@ -156,11 +174,11 @@ public partial class KernelManager : Control
 
     private async Task IngestDocumentsAsync()
     {
-        for (int i = 0; i < filesToIngest.Length; i++)
+        for (int i = 0; i < filePaths.Length; i++)
         {
-            string path = filesToIngest[i];
+            string path = filePaths[i];
             Stopwatch sw = Stopwatch.StartNew();
-            GD.Print($"Importing {i + 1} of {filesToIngest.Length}: {path}");
+            GD.Print($"Importing {i + 1} of {filePaths.Length}: {path}");
             await memory.ImportDocumentAsync(path, steps: Constants.PipelineWithoutSummary);
             GD.Print($"Completed in {sw.Elapsed}\n");
         }
@@ -171,14 +189,33 @@ public partial class KernelManager : Control
 	{
 		await Task.Run(async () =>
 		{
-			await foreach (var text in session.ChatAsync(new ChatHistory.Message(AuthorRole.User, prompt), new InferenceParams { Temperature = 0.5f, AntiPrompts = ["\n\n"] }))
-			{
-				CallDeferred(nameof(DeferredEmitNewChatMessage), text);
-			}
-		});
+            Stopwatch sw = Stopwatch.StartNew();
+            CallDeferred(nameof(DeferredEmitNewChatMessage), $"Generating answer...\n");
+            MemoryAnswer answer = await memory.AskAsync(prompt);
+            CallDeferred(nameof(DeferredEmitNewChatMessage), $"Answer generated in {sw.Elapsed}\n");
+
+            CallDeferred(nameof(DeferredEmitNewChatMessage), $"Answer: {answer.Result}\n");
+            foreach (var source in answer.RelevantSources)
+            {
+                CallDeferred(nameof(DeferredEmitNewChatMessage), $"Source: {source.SourceName}\n");
+            }
+        });
 	}
 
-	public void DeferredEmitNewChatMessage(string message)
+    //public async Task SubmitPromptAsync(string prompt)
+    //{
+    //    await Task.Run(async () =>
+    //    {
+    //        await foreach (var text in session.ChatAsync(new ChatHistory.Message(AuthorRole.User, prompt), new InferenceParams { Temperature = 0.5f, AntiPrompts = ["\n\n"] }))
+    //        {
+    //            CallDeferred(nameof(DeferredEmitNewChatMessage), text);
+    //        }
+    //    });
+    //}
+
+
+
+    public void DeferredEmitNewChatMessage(string message)
 	{
 		EmitSignal(nameof(NewChatMessage), message);
 	}
