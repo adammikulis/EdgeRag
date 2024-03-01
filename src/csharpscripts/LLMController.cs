@@ -4,10 +4,14 @@ using System;
 public partial class LLMController : Node
 {
 
-	private Button startProgramButton;
+	private Button disclaimerAcceptButton, startProgramButton;
+	private PopupPanel disclaimerPopupPanel;
+
 	private ChatManager chatManager;
 	private KernelManager kernelManager;
 	private Control splashScreen;
+
+	private bool userAcceptedDisclaimer = false;
 
 	public override void _Ready()
 	{
@@ -16,9 +20,12 @@ public partial class LLMController : Node
 
         splashScreen = GetNode<Control>("%SplashScreen");
 		startProgramButton = GetNode<Button>("%StartProgramButton");
+		disclaimerAcceptButton = GetNode<Button>("%DisclaimerAcceptButton");
 
-		// These are custom signals from the KernelManager to decouple operations with a state machine
-		kernelManager.OnChatButtonPressed += ManageChatState;
+
+
+        // These are custom signals from the KernelManager to decouple operations with a state machine
+        kernelManager.OnChatButtonPressed += ManageChatState;
 		kernelManager.NewChatMessage += chatManager.PrintModelOutput;
 
         // These are custom signals from the ChatManager to decouple operations with a state machine
@@ -27,11 +34,21 @@ public partial class LLMController : Node
 
 		// For splash screen
 		startProgramButton.Pressed += OnStartProgramButtonPressed;
+		disclaimerAcceptButton.Pressed += OnDisclaimerAcceptButtonPressed;
 		ShowSplashScreen();
+
+
     }
 
+	private void OnDisclaimerAcceptButtonPressed()
+	{
+		startProgramButton.CallDeferred("set_disabled", false);
+		userAcceptedDisclaimer = true;
+	}
+
+
 	// Wrapper for async method to avoid error with signal calling
-    private void OnPromptSubmit(string prompt)
+	private void OnPromptSubmit(string prompt)
     {
         _ = kernelManager.SubmitPromptAsync(prompt);
     }

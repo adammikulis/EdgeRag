@@ -15,12 +15,6 @@ layout_mode = 2
 size_flags_horizontal = 3
 alignment = 2
 
-[node name="CurrentFilesStagedRichTextLabel" type="RichTextLabel" parent="DatabaseVBoxContainer"]
-unique_name_in_owner = true
-layout_mode = 2
-text = "Current Files Staged:"
-fit_content = true
-
 [node name="CurrentDatabaseFolderRichTextLabel" type="RichTextLabel" parent="DatabaseVBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
@@ -30,32 +24,14 @@ fit_content = true
 [node name="HBoxContainer" type="HBoxContainer" parent="DatabaseVBoxContainer"]
 layout_mode = 2
 
-[node name="ChooseFilesForDatabaseButton" type="Button" parent="DatabaseVBoxContainer/HBoxContainer"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 75)
-layout_mode = 2
-text = "Choose Files for Database"
-
-[node name="ChooseDatabaseFolderButton" type="Button" parent="DatabaseVBoxContainer/HBoxContainer"]
+[node name="SelectDatabaseFolderButton" type="Button" parent="DatabaseVBoxContainer/HBoxContainer"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 75)
 layout_mode = 2
 size_flags_horizontal = 3
-text = "Choose Database Folder"
+text = "Select a Database Folder"
 
-[node name="ChooseFilesForDatabaseFileDialog" type="FileDialog" parent="."]
-unique_name_in_owner = true
-title = "Add Files to Database"
-initial_position = 2
-size = Vector2i(500, 500)
-ok_button_text = "Open"
-mode_overrides_title = false
-file_mode = 1
-access = 2
-show_hidden_files = true
-use_native_dialog = true
-
-[node name="ChooseDatabaseFolderFileDialog" type="FileDialog" parent="."]
+[node name="SelectDatabaseFolderFileDialog" type="FileDialog" parent="."]
 unique_name_in_owner = true
 title = "Add File(s) to Database"
 size = Vector2i(500, 500)
