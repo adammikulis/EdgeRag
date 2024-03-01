@@ -19,6 +19,8 @@ public partial class KernelManager : Control
     [Signal]
     public delegate void NewChatMessageEventHandler(string message);
 
+    private Label gpuLayerCountLabel;
+
     private Button chatButton, initializeKernelButton, ingestFilesButton;
 
 	public IKernelMemory memory;
@@ -40,6 +42,9 @@ public partial class KernelManager : Control
 
 	public override void _Ready()
 	{
+        gpuLayerCountLabel = GetNode<Label>("%GpuLayerCountLabel");
+
+
         chatButton = GetNode<Button>("%ChatButton");
         initializeKernelButton = GetNode<Button>("%InitializeKernelButton");
         ingestFilesButton = GetNode<Button>("%IngestFilesButton");
@@ -118,6 +123,7 @@ public partial class KernelManager : Control
             memory = CreateMemoryWithLocalStorage();
 
         });
+        gpuLayerCountLabel.Text = $"Gpu Layer Count: {gpuLayerCount}";
 
     }
 
@@ -160,6 +166,7 @@ public partial class KernelManager : Control
             Directory = databaseFolderPath,
             StorageType = FileSystemTypes.Disk,
         };
+
 
         return new KernelMemoryBuilder()
             .WithSimpleFileStorage(storageConfig)
