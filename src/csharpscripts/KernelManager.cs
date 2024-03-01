@@ -28,7 +28,7 @@ public partial class KernelManager : Control
 
     private uint contextSize = 4096;
     private uint seed = 0;
-    private int gpuLayerCount = -1;
+    private int gpuLayerCount = 33;
 
     private string modelPath = null;
     private string databaseFolderPath = null;
