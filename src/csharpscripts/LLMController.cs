@@ -43,6 +43,8 @@ public partial class LLMController : Node
 	private void OnDisclaimerAcceptButtonPressed()
 	{
 		startProgramButton.CallDeferred("set_disabled", false);
+		disclaimerAcceptButton.CallDeferred("set_diabled", true);
+		disclaimerAcceptButton.Text = "Disclaimer Accepted!";
 		userAcceptedDisclaimer = true;
 	}
 
@@ -50,7 +52,7 @@ public partial class LLMController : Node
 	// Wrapper for async method to avoid error with signal calling
 	private void OnPromptSubmit(string prompt)
     {
-        _ = kernelManager.SubmitPromptAsync(prompt);
+        _ = kernelManager.QueryDatabaseAsync(prompt);
     }
 
 

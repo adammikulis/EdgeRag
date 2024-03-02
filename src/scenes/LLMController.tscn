@@ -1,8 +1,14 @@
-[gd_scene load_steps=4 format=3 uid="uid://4u10q38gk8d2"]
+[gd_scene load_steps=6 format=3 uid="uid://4u10q38gk8d2"]
 
 [ext_resource type="Script" path="res://src/csharpscripts/LLMController.cs" id="1_dnh8n"]
 [ext_resource type="PackedScene" uid="uid://xc0u42fe13b8" path="res://src/scenes/KernelManager.tscn" id="2_ju43b"]
 [ext_resource type="PackedScene" uid="uid://d3liusj36fbyd" path="res://src/scenes/ChatManager.tscn" id="3_tkss5"]
+
+[sub_resource type="SystemFont" id="SystemFont_elftf"]
+
+[sub_resource type="Theme" id="Theme_u5dwk"]
+default_font = SubResource("SystemFont_elftf")
+default_font_size = 25
 
 [node name="LLMController" type="Node"]
 script = ExtResource("1_dnh8n")
@@ -41,6 +47,12 @@ theme_override_constants/margin_bottom = 50
 layout_mode = 2
 theme_override_constants/separation = 10
 alignment = 1
+
+[node name="HeadingLabel" type="Label" parent="SplashScreen/PanelContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme = SubResource("Theme_u5dwk")
+text = "EdgeRag - A local AI Chatbot that can query your documents"
+horizontal_alignment = 1
 
 [node name="DisclaimerRichTextLabel" type="RichTextLabel" parent="SplashScreen/PanelContainer/MarginContainer/VBoxContainer"]
 layout_mode = 2

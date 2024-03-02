@@ -7,8 +7,6 @@ public partial class DatabaseManager : MarginContainer
 	[Signal]
 	public delegate void OnDatabaseFolderSelectedEventHandler(string databaseFolderPath);
 	[Signal]
-	public delegate void OnAddFilesToDatabaseEventHandler(string[] filePaths);
-	[Signal]
 	public delegate void OnProcessFilesEventHandler();
 	
 	
@@ -16,52 +14,33 @@ public partial class DatabaseManager : MarginContainer
 	private string databaseFolderPath;
 	private string[] filePaths;
 
-	private Button chooseFilesForDatabaseButton, chooseDatabaseFolderButton, processFilesButton;
+	private Button selectDatabaseFolderButton;
 
-	private FileDialog chooseFilesForDatabaseFileDialog, chooseDatabaseFolderFileDialog;
-    private RichTextLabel currentDatabaseFolderRichTextLabel, currentFilesStagedRichTextLabel;
+	private FileDialog selectDatabaseFolderFileDialog;
+    private RichTextLabel currentDatabaseFolderRichTextLabel;
 
     public override void _Ready()
 	{
 
-        currentFilesStagedRichTextLabel = GetNode<RichTextLabel>("%CurrentFilesStagedRichTextLabel");
 		currentDatabaseFolderRichTextLabel = GetNode<RichTextLabel>("%CurrentDatabaseFolderRichTextLabel");
 
-        chooseFilesForDatabaseButton = GetNode<Button>("%ChooseFilesForDatabaseButton");
-		chooseDatabaseFolderButton = GetNode<Button>("%ChooseDatabaseFolderButton");
+		selectDatabaseFolderButton = GetNode<Button>("%SelectDatabaseFolderButton");
 
+		selectDatabaseFolderFileDialog = GetNode<FileDialog>("%SelectDatabaseFolderFileDialog");
+		selectDatabaseFolderButton.Pressed += OnSelectDatabaseFolderButtonPressed;
+		selectDatabaseFolderFileDialog.DirSelected += OnSelectDatabaseFolderDirSelected;
 
-		chooseFilesForDatabaseFileDialog = GetNode<FileDialog>("%ChooseFilesForDatabaseFileDialog");
-		chooseDatabaseFolderFileDialog = GetNode<FileDialog>("%ChooseDatabaseFolderFileDialog");
-
-		chooseFilesForDatabaseButton.Pressed += OnChooseFilesForDatabaseButtonPressed;
-		chooseDatabaseFolderButton.Pressed += OnChooseDatabaseFolderButtonPressed;
-
-		chooseDatabaseFolderFileDialog.DirSelected += OnChooseDatabaseFolderDirSelected;
-		chooseFilesForDatabaseFileDialog.FilesSelected += OnAddFilesToDatabaseFilesSelected;
 
     }
 
 
-	private void OnChooseFilesForDatabaseButtonPressed()
+
+    private void OnSelectDatabaseFolderButtonPressed()
 	{
-		chooseFilesForDatabaseFileDialog.CallDeferred("show");
+		selectDatabaseFolderFileDialog.CallDeferred("popup_centered");
 	}
 
-	private void OnAddFilesToDatabaseFilesSelected(string[] filePaths)
-	{
-		this.filePaths = filePaths;
-		currentFilesStagedRichTextLabel.Text = $"Current files staged: {filePaths}";
-		EmitSignal(SignalName.OnAddFilesToDatabase, filePaths);
-	}
-
-
-    private void OnChooseDatabaseFolderButtonPressed()
-	{
-		chooseDatabaseFolderFileDialog.CallDeferred("popup_centered");
-	}
-
-	private void OnChooseDatabaseFolderDirSelected(string databaseFolderPath)
+	private void OnSelectDatabaseFolderDirSelected(string databaseFolderPath)
 	{
 		this.databaseFolderPath = databaseFolderPath;
 		currentDatabaseFolderRichTextLabel.Text = $"Current Database Folder: {databaseFolderPath}";
@@ -76,8 +55,7 @@ public partial class DatabaseManager : MarginContainer
 	private void HideUI()
 	{
 		CallDeferred("hide");
-		chooseFilesForDatabaseFileDialog.CallDeferred("hide");
-		chooseDatabaseFolderFileDialog.CallDeferred("hide");
+		selectDatabaseFolderFileDialog.CallDeferred("hide");
 	}
 
 	
