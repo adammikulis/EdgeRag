@@ -10,7 +10,8 @@ config_version=5
 
 [application]
 
-config/name="EdgeRagUI"
+config/name="EdgeRag"
+config/description="This is a program that allows you to run large language models on your local device and query your documents via vector database search."
 run/main_scene="res://src/scenes/LLMController.tscn"
 config/features=PackedStringArray("4.2", "C#", "Mobile")
 config/icon="res://icon.svg"
