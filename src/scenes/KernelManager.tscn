@@ -60,10 +60,11 @@ custom_minimum_size = Vector2(0, 75)
 layout_mode = 2
 size_flags_horizontal = 3
 disabled = true
-text = "Initialize Kernel (Select a Database and Model first)"
+text = "Initialize Kernel (Select a Model and Database first)"
 
 [node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer/MarginContainer/VBoxContainer"]
 layout_mode = 2
+size_flags_vertical = 3
 theme_override_constants/separation = 10
 
 [node name="ChatButton" type="Button" parent="VBoxContainer/MarginContainer/VBoxContainer/HBoxContainer"]
@@ -72,13 +73,25 @@ custom_minimum_size = Vector2(0, 75)
 layout_mode = 2
 size_flags_horizontal = 3
 disabled = true
-text = "Chat (Initialize Kernel First)"
+text = "Chat (Initialize Kernel first)"
 
-[node name="Button" type="Button" parent="VBoxContainer/MarginContainer/VBoxContainer/HBoxContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer/MarginContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="AddFilesToDatabaseButton" type="Button" parent="VBoxContainer/MarginContainer/VBoxContainer/HBoxContainer/HBoxContainer"]
+unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 disabled = true
-text = "Add Files to Database (Initialize Kernel First)"
+text = "Add Files to Database (Initialize Kernel first)"
+
+[node name="AddFilesProgressBar" type="ProgressBar" parent="VBoxContainer/MarginContainer/VBoxContainer/HBoxContainer/HBoxContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 1
 
 [node name="AddFilesToDatabaseFileDialog" type="FileDialog" parent="."]
 unique_name_in_owner = true

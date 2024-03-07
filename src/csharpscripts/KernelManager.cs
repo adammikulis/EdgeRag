@@ -19,18 +19,19 @@ public partial class KernelManager : Control
     [Signal]
     public delegate void NewChatMessageEventHandler(string message);
 
-    private Label gpuLayerCountLabel;
 
-    private Button chatButton, initializeKernelButton, ingestFilesButton;
+    private FileDialog addFilesToDatabaseFileDialog;
+
+    private Button chatButton, initializeKernelButton, addFilesToDatabaseButton;
 
 	public IKernelMemory memory;
 
     private ModelManager modelManager;
     private DatabaseManager databaseManager;
 
-    private uint contextSize = 4096;
+    private uint contextSize = 2048;
     private uint seed = 0;
-    private int gpuLayerCount = 0;
+    private int gpuLayerCount = 33;
 
     private string modelPath = null;
     private string databaseFolderPath = null;
@@ -42,48 +43,38 @@ public partial class KernelManager : Control
 
 	public override void _Ready()
 	{
-        gpuLayerCountLabel = GetNode<Label>("%GpuLayerCountLabel");
-
+        addFilesToDatabaseFileDialog = GetNode<FileDialog>("%AddFilesToDatabaseFileDialog");
 
         chatButton = GetNode<Button>("%ChatButton");
         initializeKernelButton = GetNode<Button>("%InitializeKernelButton");
-        ingestFilesButton = GetNode<Button>("%IngestFilesButton");
+        addFilesToDatabaseButton = GetNode<Button>("%AddFilesToDatabaseButton");
 
         modelManager = GetNode<ModelManager>("%ModelManager");
         databaseManager = GetNode<DatabaseManager>("%DatabaseManager");
 
         modelManager.OnModelSelected += OnModelSelected;
         databaseManager.OnDatabaseFolderSelected += OnDatabaseFolderSelected;
-        databaseManager.OnAddFilesToDatabase += OnAddFilesToDatabase;
-
+        
+        addFilesToDatabaseButton.Pressed += OnAddFilesToDatabaseButtonPressed;
         initializeKernelButton.Pressed += OnInitializeKernelButtonPressed;
-        ingestFilesButton.Pressed += async () => await IngestDocumentsAsync();
+        
+        addFilesToDatabaseFileDialog.FilesSelected += IngestDocumentsAsync;
         chatButton.Pressed += () => EmitSignal(SignalName.OnChatButtonPressed);
     }
 
 
-    private void OnAddFilesToDatabase(string[] filePaths)
+    private void OnAddFilesToDatabaseButtonPressed()
     {
-        this.filePaths = filePaths;
-    }
-
-    private async void OnIngestFilesButtonPressed()
-    {
-        await IngestDocumentsAsync();
-    }
-
-    private async void OnDatabaseProcessFiles()
-    {
-        await IngestDocumentsAsync();
+        addFilesToDatabaseFileDialog.CallDeferred("popup_centered");
     }
 
     private async void OnInitializeKernelButtonPressed()
     {
         await InitializeKernelAsync();
-        ingestFilesButton.Disabled = false;
+        addFilesToDatabaseButton.Disabled = false;
         chatButton.Disabled = false;
+        addFilesToDatabaseButton.Disabled = false;
     }
-
 
     private void OnDatabaseFolderSelected(string databaseFolderPath)
     {
@@ -123,10 +114,10 @@ public partial class KernelManager : Control
             memory = CreateMemoryWithLocalStorage();
 
         });
-        gpuLayerCountLabel.Text = $"Gpu Layer Count: {gpuLayerCount}";
 
     }
 
+    // Does not utilize GPU for some reason even when layers are 1-33
     private IKernelMemory CreateMemoryWithLocalStorage()
     {
         LLama.Common.InferenceParams infParams = new() 
@@ -144,15 +135,15 @@ public partial class KernelManager : Control
 
         SearchClientConfig searchClientConfig = new()
         {
-            MaxMatchesCount = 1,
-            AnswerTokens = 256,
+            MaxMatchesCount = 3,
+            AnswerTokens = 512,
         };
 
         TextPartitioningOptions parseOptions = new()
         {
-            MaxTokensPerParagraph = 300,
-            MaxTokensPerLine = 100,
-            OverlappingTokens = 30
+            MaxTokensPerParagraph = 512,
+            MaxTokensPerLine = 128,
+            OverlappingTokens = 64
         };
 
         SimpleFileStorageConfig storageConfig = new()
@@ -167,7 +158,6 @@ public partial class KernelManager : Control
             StorageType = FileSystemTypes.Disk,
         };
 
-
         return new KernelMemoryBuilder()
             .WithSimpleFileStorage(storageConfig)
             .WithSimpleVectorDb(vectorDbConfig)
@@ -177,7 +167,7 @@ public partial class KernelManager : Control
             .Build();
     }
 
-    private async Task IngestDocumentsAsync()
+    private async void IngestDocumentsAsync(string[] filePaths)
     {
         for (int i = 0; i < filePaths.Length; i++)
         {
@@ -189,8 +179,8 @@ public partial class KernelManager : Control
         }
     }
 
-
-    public async Task SubmitPromptAsync(string prompt)
+    // Does not seem to use GPU
+    public async Task QueryDatabaseAsync(string prompt)
 	{
 		await Task.Run(async () =>
 		{
@@ -207,6 +197,7 @@ public partial class KernelManager : Control
         });
 	}
 
+    // Old method for chatting, no longer works without a session
     //public async Task SubmitPromptAsync(string prompt)
     //{
     //    await Task.Run(async () =>
