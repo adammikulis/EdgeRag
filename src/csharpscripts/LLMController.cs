@@ -46,6 +46,8 @@ public partial class LLMController : Node
 		disclaimerAcceptButton.CallDeferred("set_disabled", true);
 		disclaimerAcceptButton.Text = "Disclaimer Accepted!";
 		userAcceptedDisclaimer = true;
+		disclaimerAcceptButton.Text = "Disclaimer Accepted!";
+		disclaimerAcceptButton.CallDeferred("set_disabled", true);
 	}
 
 
