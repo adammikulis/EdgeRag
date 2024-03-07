@@ -10,7 +10,7 @@ config_version=5
 
 [application]
 
-config/name="EdgeRagUI"
+config/name="EdgeRag"
 run/main_scene="res://src/scenes/LLMController.tscn"
 config/features=PackedStringArray("4.2", "C#", "Mobile")
 config/icon="res://icon.svg"
