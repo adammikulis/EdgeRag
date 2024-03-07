@@ -1,25 +1,19 @@
-﻿
-Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.9.34616.47
-MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EdgeRag", "EdgeRag.csproj", "{A7862CCD-D973-43B4-87E7-36FBA94411EA}"
+﻿Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EdgeRag", "EdgeRag.csproj", "{B60A0CDC-F1BA-4199-BFD4-C832B9A3D5CA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-		Debug|Any CPU = Debug|Any CPU
-		ExportDebug|Any CPU = ExportDebug|Any CPU
-		ExportRelease|Any CPU = ExportRelease|Any CPU
+	Debug|Any CPU = Debug|Any CPU
+	ExportDebug|Any CPU = ExportDebug|Any CPU
+	ExportRelease|Any CPU = ExportRelease|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{A7862CCD-D973-43B4-87E7-36FBA94411EA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A7862CCD-D973-43B4-87E7-36FBA94411EA}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A7862CCD-D973-43B4-87E7-36FBA94411EA}.ExportDebug|Any CPU.ActiveCfg = ExportDebug|Any CPU
-		{A7862CCD-D973-43B4-87E7-36FBA94411EA}.ExportDebug|Any CPU.Build.0 = ExportDebug|Any CPU
-		{A7862CCD-D973-43B4-87E7-36FBA94411EA}.ExportRelease|Any CPU.ActiveCfg = ExportRelease|Any CPU
-		{A7862CCD-D973-43B4-87E7-36FBA94411EA}.ExportRelease|Any CPU.Build.0 = ExportRelease|Any CPU
-	EndGlobalSection
-	GlobalSection(SolutionProperties) = preSolution
-		HideSolutionNode = FALSE
+		{B60A0CDC-F1BA-4199-BFD4-C832B9A3D5CA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B60A0CDC-F1BA-4199-BFD4-C832B9A3D5CA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B60A0CDC-F1BA-4199-BFD4-C832B9A3D5CA}.ExportDebug|Any CPU.ActiveCfg = ExportDebug|Any CPU
+		{B60A0CDC-F1BA-4199-BFD4-C832B9A3D5CA}.ExportDebug|Any CPU.Build.0 = ExportDebug|Any CPU
+		{B60A0CDC-F1BA-4199-BFD4-C832B9A3D5CA}.ExportRelease|Any CPU.ActiveCfg = ExportRelease|Any CPU
+		{B60A0CDC-F1BA-4199-BFD4-C832B9A3D5CA}.ExportRelease|Any CPU.Build.0 = ExportRelease|Any CPU
 	EndGlobalSection
 EndGlobal
