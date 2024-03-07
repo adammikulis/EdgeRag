@@ -19,7 +19,7 @@ config/icon="res://icon.svg"
 
 [dotnet]
 
-project/assembly_name="EdgeRagUI"
+project/assembly_name="EdgeRag"
 
 [rendering]
 
